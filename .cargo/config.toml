@@ -3,3 +3,9 @@ rustflags = ["-C", "link-arg=-fuse-ld=/usr/local/bin/zld", "-Zshare-generics=y"]
 
 [profile.dev]
 debug = 1
+
+[profile.release]
+lto = "thin"
+
+[alias]
+dev = "run --features native"

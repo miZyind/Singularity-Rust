@@ -1,9 +1,5 @@
 [env.release]
-RELEASE_ARGS = "-Z unstable-options --out-dir bin --release"
-
-[tasks.clean]
-clear = true
-script = ["cargo clean", "cargo clean --target-dir bin"]
+RELEASE_ARGS = "-Z unstable-options --out-dir target/bin --release"
 
 [tasks.native]
 command = "cargo"
@@ -32,7 +28,7 @@ dependencies = ["prepare-web-target", "prepare-web-cli"]
 command = "wasm-bindgen"
 args = [
     "--out-dir",
-    "bin",
+    "target/bin",
     "--out-name",
     "${CARGO_MAKE_CRATE_NAME}",
     "--target",
