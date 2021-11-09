@@ -1,26 +1,22 @@
-[env]
-TARGET_DIR = "target"
-ENV_DIR = "debug"
-ARTIFACTS_ARGS = ""
-WASM_PATH = "${TARGET_DIR}/web/${ENV_DIR}/${CARGO_MAKE_CRATE_NAME}.wasm"
-
 [env.release]
-ENV_DIR = "release"
 RELEASE_ARGS = "-Z unstable-options --out-dir bin --release"
+
+[tasks.clean]
+clear = true
+script = ["cargo clean", "cargo clean --target-dir bin"]
 
 [tasks.native]
 command = "cargo"
 args = ["build", "--features", "native", "@@split(RELEASE_ARGS, )"]
 
-[tasks.dev]
-command = "${TARGET_DIR}/native/${ENV_DIR}/${CARGO_MAKE_BINARY_EXECUTABLE_NAME}"
-dependencies = ["native"]
-
-[tasks.prepare-web]
+[tasks.prepare-web-target]
 command = "rustup"
 args = ["target", "install", "wasm32-unknown-unknown"]
 
-[tasks.build-web]
+[tasks.prepare-web-cli]
+install_crate = { crate_name = "wasm-bindgen-cli", version = "0.2.69", binary = "wasm-bindgen", test_arg = "--help" }
+
+[tasks.prepare-web]
 command = "cargo"
 args = [
     "build",
@@ -28,22 +24,20 @@ args = [
     "web",
     "--target",
     "wasm32-unknown-unknown",
-    "@@split(RELEASE_ARGS, )",
+    "--release",
 ]
-dependencies = ["prepare-web"]
-
-[tasks.prepare-bind-web]
-install_crate = { crate_name = "wasm-bindgen-cli", version = "0.2.69", binary = "wasm-bindgen", test_arg = "--help" }
+dependencies = ["prepare-web-target", "prepare-web-cli"]
 
 [tasks.web]
 command = "wasm-bindgen"
 args = [
     "--out-dir",
-    "${TARGET_DIR}",
+    "bin",
     "--out-name",
     "${CARGO_MAKE_CRATE_NAME}",
     "--target",
     "web",
-    "${WASM_PATH}",
+    "--no-typescript",
+    "target/wasm32-unknown-unknown/release/${CARGO_MAKE_CRATE_NAME}.wasm",
 ]
-dependencies = ["build-web", "prepare-bind-web"]
+dependencies = ["prepare-web"]
