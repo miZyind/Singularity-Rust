@@ -30,7 +30,7 @@ pub fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
         })
         .insert(RigidBodyPositionSync::Discrete)
         .with_children(|parent| {
-            parent.spawn_scene(asset_server.load("models/shiba.gltf#Scene0"));
+            parent.spawn_scene(asset_server.load("models/shiba/shiba.gltf#Scene0"));
         })
         .id();
 }
