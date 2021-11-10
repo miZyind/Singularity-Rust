@@ -3,12 +3,12 @@ use std::ops::Deref;
 
 #[derive(Default)]
 pub struct LookEvent {
-    pub rotation: Vec3,
+    pub position: Vec3,
 }
 
 impl LookEvent {
     pub fn new(other: &Vec3) -> Self {
-        Self { rotation: *other }
+        Self { position: *other }
     }
 }
 
@@ -16,7 +16,7 @@ impl Deref for LookEvent {
     type Target = Vec3;
 
     fn deref(&self) -> &Self::Target {
-        &self.rotation
+        &self.position
     }
 }
 

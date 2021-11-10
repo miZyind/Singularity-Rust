@@ -1,9 +1,5 @@
 use crate::lib::{events::*, inputs::*, look::*};
 use bevy::prelude::*;
-use bevy_rapier3d::{
-    na::{UnitQuaternion, Vector3},
-    prelude::RigidBodyPosition,
-};
 
 pub struct BodyTag;
 pub struct ControllerPlugin;
@@ -167,18 +163,5 @@ pub fn input_to_events(
             translation_events.send(TranslationEvent::new(&translation));
         }
         controller.input_state = InputState::default();
-    }
-}
-
-pub fn controller_to_yaw(
-    mut looks: EventReader<LookEvent>,
-    mut query: Query<&mut RigidBodyPosition, With<BodyTag>>,
-) {
-    if let Some(look) = looks.iter().next() {
-        for mut rb_pos in query.iter_mut() {
-            let tau = 2. * std::f32::consts::PI;
-            // TODO: IsometricAiming
-            rb_pos.position.rotation = UnitQuaternion::new(Vector3::y() * -((look.x + tau) % tau));
-        }
     }
 }

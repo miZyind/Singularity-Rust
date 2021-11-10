@@ -3,14 +3,14 @@ use bevy::{input::mouse::MouseMotion, prelude::*};
 
 pub struct MouseSettings {
     pub sensitivity: f32,
-    pub yaw_pitch_roll: Vec3,
+    pub position: Vec3,
 }
 
 impl Default for MouseSettings {
     fn default() -> Self {
         Self {
             sensitivity: 0.01,
-            yaw_pitch_roll: Vec3::ZERO,
+            position: Vec3::ZERO,
         }
     }
 }
@@ -26,7 +26,7 @@ pub fn input_to_look(
     }
     if look.length_squared() > 1E-6 {
         look *= settings.sensitivity;
-        settings.yaw_pitch_roll += look.extend(0.0);
-        look_events.send(LookEvent::new(&settings.yaw_pitch_roll));
+        settings.position += look.extend(0.0);
+        look_events.send(LookEvent::new(&settings.position));
     }
 }

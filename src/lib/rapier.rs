@@ -23,7 +23,6 @@ impl Plugin for RapierDynamicForceControllerPlugin {
                     .label(CONTROLLER_TO_RAPIER_DYNAMIC_FORCE_SYSTEM)
                     .after(BODY_TO_VELOCITY_SYSTEM),
             )
-            .add_system(controller_to_yaw.system())
             .add_system(controller_to_kinematic.system());
     }
 }
@@ -76,3 +75,67 @@ pub fn controller_to_kinematic(
         }
     }
 }
+
+// pub fn ground_intersect(
+//     // mut query: Query<(&mut Player, Entity, &RigidBodyVelocity)>,
+//     mut query: Query<(&mut Controller, &RigidBodyVelocity), With<BodyTag>>,
+//     grounds: Res<Grounds>,
+//     mut psc_event: EventWriter<PlayerStateChangeEvent>,
+//     mut intersection_events: EventReader<IntersectionEvent>,
+// ) {
+//     if let Ok((mut controller, rb_vel)) = query.single_mut() {
+//         for intersection_event in intersection_events.iter() {
+//             match intersection_event {
+//                 IntersectionEvent {
+//                     collider1,
+//                     collider2,
+//                     intersecting: true,
+//                     ..
+//                 } => {
+//                     if !grounds.contains(&collider1.entity())
+//                         && !grounds.contains(&collider2.entity())
+//                     {
+//                         return;
+//                     }
+//                     if collider1.entity() == player_entity || collider2.entity() == player_entity {
+//                         if rb_vel
+//                             .linvel
+//                             .data
+//                             .0
+//                             .get(0)
+//                             .map(|x| x[0] == 0.)
+//                             .unwrap_or_default()
+//                         {
+//                             player.state = PlayerState::Wait;
+//                             psc_event.send(PlayerStateChangeEvent {
+//                                 state: PlayerState::Wait,
+//                             });
+//                         } else {
+//                             player.state = PlayerState::Walk(0);
+//                             psc_event.send(PlayerStateChangeEvent {
+//                                 state: PlayerState::Walk(0),
+//                             });
+//                         };
+//                     }
+//                 }
+//                 IntersectionEvent {
+//                     collider1,
+//                     collider2,
+//                     intersecting: false,
+//                 } => {
+//                     if !grounds.contains(&collider1.entity())
+//                         && !grounds.contains(&collider2.entity())
+//                     {
+//                         return;
+//                     }
+//                     if collider1.entity() == player_entity || collider2.entity() == player_entity {
+//                         player.state = PlayerState::Jump;
+//                         psc_event.send(PlayerStateChangeEvent {
+//                             state: PlayerState::Jump,
+//                         });
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// }

@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_mod_raycast::RayCastMesh;
 use bevy_rapier3d::{
     physics::*,
     prelude::{
@@ -7,7 +8,7 @@ use bevy_rapier3d::{
     },
 };
 
-use crate::constants;
+use crate::{constants, MyRaycastSet};
 
 pub fn spawn(
     mut commands: Commands,
@@ -17,29 +18,29 @@ pub fn spawn(
     // plane
     let box_xz = 10.0;
     let box_y = 1.0;
-    commands
-        .spawn_bundle(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-            material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-            transform: Transform::from_matrix(Mat4::from_scale_rotation_translation(
-                Vec3::new(box_xz, box_y, box_xz),
-                Quat::IDENTITY,
-                Vec3::ZERO,
-            )),
+    let mut pbr = commands.spawn_bundle(PbrBundle {
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+        transform: Transform::from_matrix(Mat4::from_scale_rotation_translation(
+            Vec3::new(box_xz, box_y, box_xz),
+            Quat::IDENTITY,
+            Vec3::ZERO,
+        )),
+        ..Default::default()
+    });
+    pbr.insert_bundle(RigidBodyBundle {
+        body_type: RigidBodyType::Static,
+        ..Default::default()
+    })
+    .insert_bundle(ColliderBundle {
+        shape: ColliderShape::cuboid(0.5 * box_xz, 0.5 * box_y, 0.5 * box_xz),
+        flags: ColliderFlags {
+            collision_groups: InteractionGroups::all().with_memberships(constants::GROUND),
             ..Default::default()
-        })
-        .insert_bundle(RigidBodyBundle {
-            body_type: RigidBodyType::Static,
-            ..Default::default()
-        })
-        .insert_bundle(ColliderBundle {
-            shape: ColliderShape::cuboid(0.5 * box_xz, 0.5 * box_y, 0.5 * box_xz),
-            flags: ColliderFlags {
-                collision_groups: InteractionGroups::all().with_memberships(constants::GROUND),
-                ..Default::default()
-            },
-            ..Default::default()
-        });
+        },
+        ..Default::default()
+    });
+    pbr.insert(RayCastMesh::<MyRaycastSet>::default());
     // cubes
     let distance = 2.0;
     commands
@@ -127,9 +128,4 @@ pub fn spawn(
         transform: Transform::from_xyz(0.0, 10.0, 0.0),
         ..Default::default()
     });
-    // camera
-    let mut camera = OrthographicCameraBundle::new_3d();
-    camera.orthographic_projection.scale = 10.0;
-    camera.transform = Transform::from_xyz(5.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y);
-    commands.spawn_bundle(camera);
 }
