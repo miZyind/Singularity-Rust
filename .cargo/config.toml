@@ -9,3 +9,4 @@ lto = "thin"
 
 [alias]
 dev = "run --features native"
+w = "watch -x run --features native"
