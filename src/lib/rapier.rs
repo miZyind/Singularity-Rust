@@ -3,6 +3,7 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 pub const BODY_TO_VELOCITY_SYSTEM: &str = "body_to_velocity";
+pub const BODY_TO_ROTATION_SYSTEM: &str = "body_to_rotation";
 pub const CONTROLLER_TO_RAPIER_DYNAMIC_FORCE_SYSTEM: &str = "controller_to_rapier_dynamic_force";
 pub const CREATE_MASS_FROM_RAPIER_SYSTEM: &str = "create_mass_from_rapier";
 
@@ -16,7 +17,13 @@ impl Plugin for RapierDynamicForceControllerPlugin {
                     .system()
                     .label(CREATE_MASS_FROM_RAPIER_SYSTEM),
             )
-            .add_system(body_to_velocity.system().label(BODY_TO_VELOCITY_SYSTEM))
+            .add_system(body_to_rotation.system().label(BODY_TO_ROTATION_SYSTEM))
+            .add_system(
+                body_to_velocity
+                    .system()
+                    .label(BODY_TO_VELOCITY_SYSTEM)
+                    .after(BODY_TO_ROTATION_SYSTEM),
+            )
             .add_system(
                 controller_to_rapier_dynamic_force
                     .system()
@@ -40,6 +47,28 @@ pub fn create_mass_from_rapier(
 pub fn body_to_velocity(mut query: Query<(&RigidBodyVelocity, &mut Controller), With<BodyTag>>) {
     for (velocity, mut controller) in query.iter_mut() {
         controller.velocity = velocity.linvel.into();
+    }
+}
+
+pub fn body_to_rotation(
+    mut looks: EventReader<LookEvent>,
+    mut query: Query<(&Transform, &mut RigidBodyPosition), With<BodyTag>>,
+) {
+    for event in looks.iter() {
+        for (transform, mut positions) in query.iter_mut() {
+            let y = transform.translation.y;
+            let up = Vec3::Y;
+            let forward = Vec3::normalize(
+                Vec3::new(event.position.x, y, event.position.z) - transform.translation,
+            );
+            let right = up.cross(forward).normalize();
+            let up = forward.cross(right);
+            let rotation = Quat::from_rotation_mat3(&Mat3::from_cols(right, up, forward));
+            if !Quat::is_nan(rotation) {
+                positions.position.rotation =
+                    Quat::from_rotation_mat3(&Mat3::from_cols(right, up, forward)).into();
+            }
+        }
     }
 }
 

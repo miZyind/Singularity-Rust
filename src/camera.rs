@@ -1,15 +1,12 @@
-use crate::{constants, MyRaycastSet};
+use crate::constants;
 use bevy::{input::mouse::MouseWheel, prelude::*, render::camera::OrthographicProjection};
-use bevy_mod_raycast::RayCastSource;
 
 pub fn spawn(mut commands: Commands) {
     let mut camera = OrthographicCameraBundle::new_3d();
 
     camera.orthographic_projection.scale = 10.0;
     camera.transform = Transform::from_xyz(5.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y);
-    commands
-        .spawn_bundle(camera)
-        .insert(RayCastSource::<MyRaycastSet>::new());
+    commands.spawn_bundle(camera);
 }
 
 pub fn zoom(

@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_mod_raycast::RayCastMesh;
 use bevy_rapier3d::{
     physics::*,
     prelude::{
@@ -8,7 +7,7 @@ use bevy_rapier3d::{
     },
 };
 
-use crate::{constants, MyRaycastSet};
+use crate::constants;
 
 pub fn spawn(
     mut commands: Commands,
@@ -18,29 +17,29 @@ pub fn spawn(
     // plane
     let box_xz = 10.0;
     let box_y = 1.0;
-    let mut pbr = commands.spawn_bundle(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
-        material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-        transform: Transform::from_matrix(Mat4::from_scale_rotation_translation(
-            Vec3::new(box_xz, box_y, box_xz),
-            Quat::IDENTITY,
-            Vec3::ZERO,
-        )),
-        ..Default::default()
-    });
-    pbr.insert_bundle(RigidBodyBundle {
-        body_type: RigidBodyType::Static,
-        ..Default::default()
-    })
-    .insert_bundle(ColliderBundle {
-        shape: ColliderShape::cuboid(0.5 * box_xz, 0.5 * box_y, 0.5 * box_xz),
-        flags: ColliderFlags {
-            collision_groups: InteractionGroups::all().with_memberships(constants::GROUND),
+    commands
+        .spawn_bundle(PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+            material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
+            transform: Transform::from_matrix(Mat4::from_scale_rotation_translation(
+                Vec3::new(box_xz, box_y, box_xz),
+                Quat::IDENTITY,
+                Vec3::ZERO,
+            )),
             ..Default::default()
-        },
-        ..Default::default()
-    });
-    pbr.insert(RayCastMesh::<MyRaycastSet>::default());
+        })
+        .insert_bundle(RigidBodyBundle {
+            body_type: RigidBodyType::Static,
+            ..Default::default()
+        })
+        .insert_bundle(ColliderBundle {
+            shape: ColliderShape::cuboid(0.5 * box_xz, 0.5 * box_y, 0.5 * box_xz),
+            flags: ColliderFlags {
+                collision_groups: InteractionGroups::all().with_memberships(constants::GROUND),
+                ..Default::default()
+            },
+            ..Default::default()
+        });
     // cubes
     let distance = 2.0;
     commands
