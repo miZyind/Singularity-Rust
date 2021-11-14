@@ -1,4 +1,5 @@
 pub mod controller;
+pub mod diagnostics;
 pub mod events;
 pub mod inputs;
 pub mod look;

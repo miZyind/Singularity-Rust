@@ -76,10 +76,10 @@ pub fn input_to_events(
     keyboard_input: Res<Input<KeyCode>>,
     mut translation_events: EventWriter<TranslationEvent>,
     mut force_events: EventWriter<ForceEvent>,
-    mut controller_query: Query<(&Mass, &Transform, &mut Controller)>,
+    mut query: Query<(&Mass, &Transform, &mut Controller)>,
 ) {
     let xz = Vec3::new(1.0, 0.0, 1.0);
-    for (mass, transform, mut controller) in controller_query.iter_mut() {
+    for (mass, transform, mut controller) in query.iter_mut() {
         controller.sim_to_render += time.delta_seconds();
 
         if keyboard_input.pressed(controller.inputs.key_forward) {

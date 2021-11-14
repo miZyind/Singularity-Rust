@@ -8,8 +8,8 @@ mod world;
 use bevy::input::system::exit_on_esc_system;
 
 use bevy::prelude::*;
-use bevy_rapier3d::{physics::TimestepMode, prelude::*};
-use lib::rapier::RapierDynamicForceControllerPlugin;
+use bevy_rapier3d::prelude::*;
+use lib::{diagnostics::DiagnosticsPlugin, rapier::RapierPlugin};
 
 fn main() {
     let mut app = App::build();
@@ -22,12 +22,9 @@ fn main() {
             ..Default::default()
         })
         .add_plugins(DefaultPlugins)
+        .add_plugin(DiagnosticsPlugin)
         .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
-        .insert_resource(RapierConfiguration {
-            timestep_mode: TimestepMode::InterpolatedTimestep,
-            ..Default::default()
-        })
-        .add_plugin(RapierDynamicForceControllerPlugin);
+        .add_plugin(RapierPlugin);
 
     #[cfg(feature = "native")]
     app.add_system(exit_on_esc_system.system());

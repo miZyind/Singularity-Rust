@@ -7,9 +7,9 @@ pub const BODY_TO_ROTATION_SYSTEM: &str = "body_to_rotation";
 pub const CONTROLLER_TO_RAPIER_DYNAMIC_FORCE_SYSTEM: &str = "controller_to_rapier_dynamic_force";
 pub const CREATE_MASS_FROM_RAPIER_SYSTEM: &str = "create_mass_from_rapier";
 
-pub struct RapierDynamicForceControllerPlugin;
+pub struct RapierPlugin;
 
-impl Plugin for RapierDynamicForceControllerPlugin {
+impl Plugin for RapierPlugin {
     fn build(&self, app: &mut AppBuilder) {
         app.add_plugin(ControllerPlugin)
             .add_system(
@@ -51,10 +51,10 @@ pub fn body_to_velocity(mut query: Query<(&RigidBodyVelocity, &mut Controller), 
 }
 
 pub fn body_to_rotation(
-    mut looks: EventReader<LookEvent>,
+    mut look_reader: EventReader<LookEvent>,
     mut query: Query<(&Transform, &mut RigidBodyPosition), With<BodyTag>>,
 ) {
-    for event in looks.iter() {
+    for event in look_reader.iter() {
         for (transform, mut positions) in query.iter_mut() {
             let y = transform.translation.y;
             let up = Vec3::Y;
@@ -73,11 +73,11 @@ pub fn body_to_rotation(
 }
 
 pub fn controller_to_rapier_dynamic_force(
-    mut forces: EventReader<ForceEvent>,
+    mut force_reader: EventReader<ForceEvent>,
     mut query: Query<(&mut RigidBodyForces, &mut RigidBodyActivation), With<BodyTag>>,
 ) {
     let mut force = Vec3::ZERO;
-    for event in forces.iter() {
+    for event in force_reader.iter() {
         force += **event;
     }
 
@@ -91,11 +91,11 @@ pub fn controller_to_rapier_dynamic_force(
 
 // TODO: Interaction Test
 pub fn controller_to_kinematic(
-    mut translations: EventReader<TranslationEvent>,
+    mut translation_reader: EventReader<TranslationEvent>,
     mut query: Query<(&mut Transform, &mut Controller), With<BodyTag>>,
 ) {
     for (mut transform, mut controller) in query.iter_mut() {
-        for translation in translations.iter() {
+        for translation in translation_reader.iter() {
             transform.translation += **translation;
         }
         if transform.translation.y < 0.0 {

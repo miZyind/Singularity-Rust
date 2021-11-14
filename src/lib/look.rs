@@ -5,6 +5,8 @@ use std::f32::EPSILON;
 const FOUNDATION_POINT: Vec3 = Vec3::ZERO;
 const FOUNDATION_NORMAL: Vec3 = Vec3::Y;
 
+pub struct LookCamera;
+
 pub struct MouseSettings {
     pub sensitivity: f32,
 }
@@ -43,13 +45,13 @@ fn screen_to_world(
 
 pub fn input_to_look(
     windows: Res<Windows>,
-    camera: Query<(&Camera, &GlobalTransform)>,
+    query: Query<(&Camera, &GlobalTransform), With<LookCamera>>,
     mut cursor_reader: EventReader<CursorMoved>,
     // mut settings: ResMut<MouseSettings>, TODO: Sensitivity integration
     mut look_writer: EventWriter<LookEvent>,
 ) {
-    if let Some(cursor) = cursor_reader.iter().last() {
-        if let Ok((camera, camera_transform)) = camera.single() {
+    for cursor in cursor_reader.iter() {
+        if let Ok((camera, camera_transform)) = query.single() {
             if let Some(world_cursor_position) =
                 screen_to_world(&windows, camera, camera_transform, cursor.position)
             {
