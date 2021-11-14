@@ -1,3 +1,5 @@
+![Singularity](https://gist.githubusercontent.com/miZyind/117e11dfdfe2ce06bddc5510995018be/raw/5c0a374801e12760560213e8004bdca60fccd49c/Logo-Name-Horizon.png)
+
 # Singularity
 
 [![Rust](https://img.shields.io/badge/Rust-000000?style=for-the-badge&label=&logo=rust&logoColor=fff)](https://www.rust-lang.org)
