@@ -7,7 +7,7 @@ edition = "2021"
 [features]
 default = ["bevy/bevy_gltf", "bevy/bevy_winit", "bevy/render", "bevy/png"]
 
-native = ["bevy/bevy_wgpu"]
+native = ["bevy/bevy_wgpu", "bevy/dynamic"]
 
 web = ["bevy_webgl2"]
 
