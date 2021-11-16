@@ -1,4 +1,4 @@
-use crate::lib::{events::*, inputs::*, look::*};
+use super::{events::*, inputs::*, look::*};
 use bevy::prelude::*;
 
 pub struct BodyTag;

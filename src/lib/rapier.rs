@@ -1,4 +1,4 @@
-use crate::lib::{controller::*, events::*};
+use super::{controller::*, events::*};
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
