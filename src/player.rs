@@ -3,7 +3,7 @@ use bevy_rapier3d::{physics::*, prelude::*};
 
 use crate::{constants, lib::controller::*};
 
-pub fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
+pub fn spawn(mut commands: Commands, assets: Res<AssetServer>) {
     commands
         .spawn_bundle((
             Transform::default(),
@@ -30,6 +30,6 @@ pub fn spawn(mut commands: Commands, asset_server: Res<AssetServer>) {
         })
         .insert(RigidBodyPositionSync::Discrete)
         .with_children(|parent| {
-            parent.spawn_scene(asset_server.load("models/shiba/shiba.gltf#Scene0"));
+            parent.spawn_scene(assets.load("models/shiba/shiba.gltf#Scene0"));
         });
 }

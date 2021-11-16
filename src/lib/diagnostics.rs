@@ -15,7 +15,7 @@ impl Plugin for DiagnosticsPlugin {
 
 struct FPSText;
 
-fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
+fn setup(mut commands: Commands, assets: Res<AssetServer>) {
     commands
         .spawn_bundle(TextBundle {
             style: Style {
@@ -27,7 +27,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     TextSection {
                         value: "FPS: ".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                            font: assets.load("fonts/FiraSans-Bold.ttf"),
                             font_size: 12.0,
                             color: Color::WHITE,
                         },
@@ -35,7 +35,7 @@ fn setup(mut commands: Commands, asset_server: Res<AssetServer>) {
                     TextSection {
                         value: "".to_string(),
                         style: TextStyle {
-                            font: asset_server.load("fonts/FiraMono-Medium.ttf"),
+                            font: assets.load("fonts/FiraMono-Medium.ttf"),
                             font_size: 12.0,
                             color: Color::GOLD,
                         },
