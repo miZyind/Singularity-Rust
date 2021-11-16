@@ -8,8 +8,8 @@ pub enum Function {
     CubicInOut(f32),
 }
 impl Function {
-    pub fn apply(timing: Function) -> f32 {
-        match timing {
+    pub fn apply(function: Function) -> f32 {
+        match function {
             Function::Linear(t) => t,
             Function::QuadraticIn(t) => t * t,
             Function::QuadraticOut(t) => -t * (t - 2.0),
