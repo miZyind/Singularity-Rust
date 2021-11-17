@@ -118,14 +118,14 @@ fn enter(
 fn update(
     time: Res<Time>,
     mut data: ResMut<Data>,
-    mut text_query: Query<(&mut Timer, &mut Text), With<Title>>,
-    mut title_image_transform_query: Query<&mut Transform, With<Image>>,
+    mut timer_text_query: Query<(&mut Timer, &mut Text), With<Title>>,
+    mut image_transform_query: Query<&mut Transform, With<Image>>,
     mut progress_bar_query: Query<&mut Style, With<ProgressBar>>,
 ) {
-    for (mut timer, mut text) in text_query.iter_mut() {
+    for (mut timer, mut text) in timer_text_query.iter_mut() {
         timer.tick(time.delta());
 
-        if timer.finished() {
+        if timer.just_finished() {
             if data.invert {
                 data.delta -= 1;
 
@@ -148,7 +148,7 @@ fn update(
         }
     }
 
-    for mut transform in title_image_transform_query.iter_mut() {
+    for mut transform in image_transform_query.iter_mut() {
         transform.rotate(Quat::from_rotation_z(
             -std::f32::consts::PI / 60.0 * time.delta_seconds(),
         ));
