@@ -41,7 +41,7 @@ fn enter(
             material: materials.add(Color::BLACK.into()),
             ..Default::default()
         })
-        .insert(Timer::from_seconds(0.1, true))
+        .insert(Timer::from_seconds(2.0, false))
         .id();
 
     handles.0.push(logo.clone_untyped());
@@ -53,7 +53,6 @@ fn enter(
 fn update(
     assets: Res<AssetServer>,
     handles: Res<Handles>,
-    mut progress: Local<f32>,
     time: Res<Time>,
     mut query: Query<(&mut Timer, &Handle<ColorMaterial>)>,
     mut materials: ResMut<Assets<ColorMaterial>>,
@@ -61,21 +60,17 @@ fn update(
 ) {
     if let LoadState::Loaded = assets.get_group_load_state(handles.0.iter().map(|handle| handle.id))
     {
-        if *progress < 1.0 {
-            if let Ok((mut timer, handle)) = query.single_mut() {
-                timer.tick(time.delta());
+        if let Ok((mut timer, handle)) = query.single_mut() {
+            timer.tick(time.delta());
+            materials.get_mut(handle).unwrap().color = lerp(
+                Color::BLACK,
+                Color::BACKGROUND,
+                Function::QuadraticIn(timer.percent()),
+            );
 
-                if timer.finished() {
-                    *progress += 0.2;
-                    materials.get_mut(handle).unwrap().color = lerp(
-                        Color::BLACK,
-                        Color::BACKGROUND,
-                        Function::QuadraticIn(*progress),
-                    );
-                }
+            if timer.finished() {
+                state.set(AppState::Loading).unwrap();
             }
-        } else {
-            state.set(AppState::Loading).unwrap();
         }
     }
 }
