@@ -18,8 +18,6 @@ impl Plugin for State {
 
 #[derive(Default)]
 struct Handles(Vec<HandleUntyped>);
-struct AnimationTimer;
-struct BackgroundBundle;
 struct Background(Entity);
 
 fn enter(
@@ -43,13 +41,12 @@ fn enter(
             material: materials.add(Color::BLACK.into()),
             ..Default::default()
         })
-        .insert(BackgroundBundle)
+        .insert(Timer::from_seconds(0.1, true))
         .id();
 
     handles.0.push(logo.clone_untyped());
     handles.0.push(font.clone_untyped());
     commands.spawn_bundle(UiCameraBundle::default());
-    commands.spawn_bundle((AnimationTimer, Timer::from_seconds(0.1, true)));
     commands.insert_resource(Background(entity));
 }
 
@@ -58,26 +55,23 @@ fn update(
     handles: Res<Handles>,
     mut progress: Local<f32>,
     time: Res<Time>,
-    mut animation_timer_query: Query<&mut Timer, With<AnimationTimer>>,
-    color_handle_query: Query<&Handle<ColorMaterial>, With<BackgroundBundle>>,
+    mut query: Query<(&mut Timer, &Handle<ColorMaterial>)>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     mut state: ResMut<bevy::ecs::schedule::State<AppState>>,
 ) {
     if let LoadState::Loaded = assets.get_group_load_state(handles.0.iter().map(|handle| handle.id))
     {
         if *progress < 1.0 {
-            if let Ok(mut timer) = animation_timer_query.single_mut() {
+            if let Ok((mut timer, handle)) = query.single_mut() {
                 timer.tick(time.delta());
 
                 if timer.finished() {
-                    if let Ok(handle) = color_handle_query.single() {
-                        *progress += 0.3;
-                        materials.get_mut(handle).unwrap().color = lerp(
-                            Color::BLACK,
-                            Color::BACKGROUND,
-                            Function::QuadraticIn(*progress),
-                        );
-                    }
+                    *progress += 0.2;
+                    materials.get_mut(handle).unwrap().color = lerp(
+                        Color::BLACK,
+                        Color::BACKGROUND,
+                        Function::QuadraticIn(*progress),
+                    );
                 }
             }
         } else {

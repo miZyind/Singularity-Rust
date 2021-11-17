@@ -20,7 +20,6 @@ struct Data {
     invert: bool,
     progress: f32,
 }
-struct AnimationTimer;
 struct Title;
 struct Image;
 struct ProgressBar;
@@ -88,7 +87,8 @@ fn enter(
                     ),
                     ..Default::default()
                 })
-                .insert(Title);
+                .insert(Title)
+                .insert(Timer::from_seconds(0.1, true));
 
             parent
                 .spawn_bundle(ImageBundle {
@@ -118,12 +118,11 @@ fn enter(
 fn update(
     time: Res<Time>,
     mut data: ResMut<Data>,
-    mut animation_timer_query: Query<&mut Timer, With<AnimationTimer>>,
-    mut title_text_query: Query<&mut Text, With<Title>>,
+    mut text_query: Query<(&mut Timer, &mut Text), With<Title>>,
     mut title_image_transform_query: Query<&mut Transform, With<Image>>,
     mut progress_bar_query: Query<&mut Style, With<ProgressBar>>,
 ) {
-    for mut timer in animation_timer_query.iter_mut() {
+    for (mut timer, mut text) in text_query.iter_mut() {
         timer.tick(time.delta());
 
         if timer.finished() {
@@ -141,13 +140,11 @@ fn update(
                 }
             }
 
-            for mut text in title_text_query.iter_mut() {
-                text.sections[0].style.color = lerp(
-                    Color::FOREGROUND_PRIMARY,
-                    Color::FOREGROUND_SECONDARY,
-                    Function::QuadraticInOut(data.delta as f32 * 0.1),
-                );
-            }
+            text.sections[0].style.color = lerp(
+                Color::FOREGROUND_PRIMARY,
+                Color::FOREGROUND_SECONDARY,
+                Function::QuadraticInOut(data.delta as f32 * 0.1),
+            );
         }
     }
 
@@ -157,7 +154,7 @@ fn update(
         ));
     }
 
-    if data.progress < 50.0 {
+    if data.progress < 100.0 {
         for mut style in progress_bar_query.iter_mut() {
             data.progress += 0.1;
             style.size.width = Val::Percent(data.progress);
