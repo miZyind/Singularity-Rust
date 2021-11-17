@@ -1,7 +1,7 @@
 use super::AppState;
 use crate::{
     constants::{Color, APP_NAME},
-    lib::{color::lerp, easing::Function},
+    lib::{color::lerp, easing::Function, font::normalize},
 };
 use bevy::prelude::*;
 
@@ -19,13 +19,16 @@ struct Data {
     title_entity: Entity,
     title_delta: i8,
     title_invert: bool,
+    progress: f32,
 }
 
+struct AnimationTimer;
 struct TitleText;
 struct TitleImage;
-struct AnimationTimer;
+struct ProgressBar;
 
 fn setup(
+    windows: Res<Windows>,
     mut commands: Commands,
     mut materials: ResMut<Assets<ColorMaterial>>,
     assets: Res<AssetServer>,
@@ -48,16 +51,39 @@ fn setup(
         })
         .with_children(|parent| {
             parent
-                .spawn_bundle(TextBundle {
+                .spawn_bundle(NodeBundle {
                     style: Style {
-                        margin: Rect::all(Val::Px(5.0)),
+                        position_type: PositionType::Absolute,
+                        position: Rect {
+                            bottom: Val::Percent(10.0),
+                            ..Default::default()
+                        },
+                        size: Size::new(Val::Percent(60.0), Val::Percent(2.0)),
                         ..Default::default()
                     },
+                    material: materials.add(Color::INACTIVE.into()),
+                    ..Default::default()
+                })
+                .with_children(|outer_bar| {
+                    outer_bar
+                        .spawn_bundle(NodeBundle {
+                            style: Style {
+                                size: Size::new(Val::Percent(0.0), Val::Percent(100.0)),
+                                ..Default::default()
+                            },
+                            material: materials.add(Color::INFO.into()),
+                            ..Default::default()
+                        })
+                        .insert(ProgressBar);
+                });
+
+            parent
+                .spawn_bundle(TextBundle {
                     text: Text::with_section(
                         APP_NAME,
                         TextStyle {
                             font: assets.load("fonts/Endor.ttf"),
-                            font_size: 144.0,
+                            font_size: normalize(windows, 144),
                             color: Color::FOREGROUND_PRIMARY,
                         },
                         TextAlignment {
@@ -72,7 +98,11 @@ fn setup(
             parent
                 .spawn_bundle(ImageBundle {
                     style: Style {
-                        size: Size::new(Val::Px(280.), Val::Px(280.)),
+                        margin: Rect {
+                            bottom: Val::Percent(1.0),
+                            ..Default::default()
+                        },
+                        size: Size::new(Val::Auto, Val::Percent(30.0)),
                         ..Default::default()
                     },
                     material: materials.add(assets.load("images/logo.png").into()),
@@ -86,15 +116,17 @@ fn setup(
         title_entity,
         title_delta: 0,
         title_invert: false,
+        progress: 0.0,
     });
 }
 
 fn update(
     time: Res<Time>,
     mut data: ResMut<Data>,
-    mut title_text_query: Query<&mut Text, With<TitleText>>,
-    // mut title_image_handle_query: Query<&Handle<ColorMaterial>, With<TitleImage>>,
     mut animation_timer_query: Query<&mut Timer, With<AnimationTimer>>,
+    mut title_text_query: Query<&mut Text, With<TitleText>>,
+    mut title_image_transform_query: Query<&mut Transform, With<TitleImage>>,
+    mut progress_bar_query: Query<&mut Style, With<ProgressBar>>,
 ) {
     for mut timer in animation_timer_query.iter_mut() {
         timer.tick(time.delta());
@@ -121,8 +153,19 @@ fn update(
                     Function::QuadraticInOut(data.title_delta as f32 * 0.1),
                 );
             }
+        }
+    }
 
-            // for handle in title_image_handle_query.iter_mut() {}
+    for mut transform in title_image_transform_query.iter_mut() {
+        transform.rotate(Quat::from_rotation_z(
+            -std::f32::consts::PI / 60.0 * time.delta_seconds(),
+        ));
+    }
+
+    if data.progress < 50.0 {
+        for mut style in progress_bar_query.iter_mut() {
+            data.progress += 0.1;
+            style.size.width = Val::Percent(data.progress);
         }
     }
 }
