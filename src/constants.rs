@@ -14,4 +14,12 @@ impl Color {
     pub const FOREGROUND_PRIMARY: BevyColor = BevyColor::rgb(0.93333, 0.81176, 0.54902);
     // #BB9865 rgb(187, 152, 101)
     pub const FOREGROUND_SECONDARY: BevyColor = BevyColor::rgb(0.73333, 0.59608, 0.39608);
+    // #30323E rgb(48, 50, 62)
+    pub const INACTIVE: BevyColor = BevyColor::rgb(0.18824, 0.19608, 0.24314);
+    // #2489A9 rgb(36, 137, 169)
+    pub const INFO: BevyColor = BevyColor::rgb(0.14118, 0.53725, 0.66275);
+    // #22B299 rgb(34, 178, 153)
+    pub const SUCCESS: BevyColor = BevyColor::rgb(0.13333, 0.69804, 0.60000);
+    // #EB5E5E rgb(235, 94, 94)
+    pub const ERROR: BevyColor = BevyColor::rgb(0.92157, 0.36863, 0.36863);
 }
