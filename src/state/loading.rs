@@ -9,17 +9,22 @@ pub struct State;
 impl Plugin for State {
     fn build(&self, app: &mut AppBuilder) {
         app.add_system_set(SystemSet::on_enter(AppState::Loading).with_system(enter.system()))
-            .add_system_set(SystemSet::on_update(AppState::Loading).with_system(update.system()))
+            .add_system_set(
+                SystemSet::on_update(AppState::Loading)
+                    .with_system(update_alpha.system())
+                    .with_system(update_text_color.system())
+                    .with_system(update_image_transform.system())
+                    .with_system(update_progress_bar.system()),
+            )
             .add_system_set(SystemSet::on_exit(AppState::Loading).with_system(exit.system()));
     }
 }
 
 struct Data {
     entity: Entity,
-    delta: i8,
-    invert: bool,
     progress: f32,
 }
+struct Background;
 struct Title;
 struct Image;
 struct ProgressBar;
@@ -88,7 +93,7 @@ fn enter(
                     ..Default::default()
                 })
                 .insert(Title)
-                .insert(Timer::from_seconds(0.1, true));
+                .insert(Timer::from_seconds(2.0, true));
 
             parent
                 .spawn_bundle(ImageBundle {
@@ -105,57 +110,76 @@ fn enter(
                 })
                 .insert(Image);
         })
+        .insert(Timer::from_seconds(2.0, false))
+        .insert(Background)
         .id();
 
     commands.insert_resource(Data {
         entity,
-        delta: 0,
-        invert: false,
         progress: 0.0,
     })
 }
 
-fn update(
+fn update_alpha(
     time: Res<Time>,
-    mut data: ResMut<Data>,
-    mut timer_text_query: Query<(&mut Timer, &mut Text), With<Title>>,
-    mut image_transform_query: Query<&mut Transform, With<Image>>,
-    mut progress_bar_query: Query<&mut Style, With<ProgressBar>>,
+    mut background_query: Query<(&mut Timer, &Children), With<Background>>,
+    image_query: Query<&Handle<ColorMaterial>, With<Image>>,
+    mut text_query: Query<&mut Text>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    for (mut timer, mut text) in timer_text_query.iter_mut() {
+    if let Ok((mut timer, children)) = background_query.single_mut() {
         timer.tick(time.delta());
 
-        if timer.just_finished() {
-            if data.invert {
-                data.delta -= 1;
+        for child in children.iter() {
+            let alpha = Function::apply(Function::QuadraticIn(timer.percent()));
 
-                if data.delta == 0 {
-                    data.invert = false;
-                }
-            } else {
-                data.delta += 1;
-
-                if data.delta == 10 {
-                    data.invert = true;
-                }
+            if let Ok(handle) = image_query.get(*child) {
+                materials.get_mut(handle).unwrap().color.set_a(alpha);
             }
 
-            text.sections[0].style.color = lerp(
-                Color::FOREGROUND_PRIMARY,
-                Color::FOREGROUND_SECONDARY,
-                Function::QuadraticInOut(data.delta as f32 * 0.1),
-            );
+            if let Ok(mut text) = text_query.get_mut(*child) {
+                text.sections[0].style.color.set_a(alpha);
+            }
         }
     }
+}
 
-    for mut transform in image_transform_query.iter_mut() {
+fn update_text_color(
+    time: Res<Time>,
+    mut query: QuerySet<(
+        Query<&Timer, With<Background>>,
+        Query<(&mut Timer, &mut Text), With<Title>>,
+    )>,
+) {
+    if let Ok(timer) = query.q0().single() {
+        if timer.finished() {
+            if let Ok((mut timer, mut text)) = query.q1_mut().single_mut() {
+                timer.tick(time.delta());
+                text.sections[0].style.color = lerp(
+                    Color::FOREGROUND_PRIMARY,
+                    Color::FOREGROUND_SECONDARY,
+                    Function::QuadraticInOut(if timer.percent() < 0.5 {
+                        timer.percent()
+                    } else {
+                        timer.percent_left()
+                    }),
+                );
+            }
+        }
+    }
+}
+
+fn update_image_transform(time: Res<Time>, mut query: Query<&mut Transform, With<Image>>) {
+    for mut transform in query.iter_mut() {
         transform.rotate(Quat::from_rotation_z(
             -std::f32::consts::PI / 60.0 * time.delta_seconds(),
         ));
     }
+}
 
+fn update_progress_bar(mut data: ResMut<Data>, mut query: Query<&mut Style, With<ProgressBar>>) {
     if data.progress < 100.0 {
-        for mut style in progress_bar_query.iter_mut() {
+        for mut style in query.iter_mut() {
             data.progress += 0.1;
             style.size.width = Val::Percent(data.progress);
         }

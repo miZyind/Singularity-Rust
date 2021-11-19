@@ -38,7 +38,7 @@ fn enter(
                 size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 ..Default::default()
             },
-            material: materials.add(Color::BLACK.into()),
+            material: materials.add(Color::BACKGROUND_TRANSPARENT.into()),
             ..Default::default()
         })
         .insert(Timer::from_seconds(2.0, false))
@@ -62,11 +62,11 @@ fn update(
     {
         if let Ok((mut timer, handle)) = query.single_mut() {
             timer.tick(time.delta());
-            materials.get_mut(handle).unwrap().color = lerp(
-                Color::BLACK,
-                Color::BACKGROUND,
-                Function::QuadraticIn(timer.percent()),
-            );
+            materials
+                .get_mut(handle)
+                .unwrap()
+                .color
+                .set_a(Function::apply(Function::QuadraticIn(timer.percent())));
 
             if timer.finished() {
                 state.set(AppState::Loading).unwrap();
