@@ -1,3 +1,4 @@
+#[allow(dead_code)]
 pub enum Function {
     Linear(f32),
     QuadraticIn(f32),
