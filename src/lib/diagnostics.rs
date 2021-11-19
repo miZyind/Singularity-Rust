@@ -25,9 +25,9 @@ fn setup(mut commands: Commands, assets: Res<AssetServer>) {
             text: Text {
                 sections: vec![
                     TextSection {
-                        value: "FPS: ".to_string(),
+                        value: "FPS:".to_string(),
                         style: TextStyle {
-                            font: assets.load("fonts/FiraSans-Bold.ttf"),
+                            font: assets.load("fonts/FiraMono-Medium.ttf"),
                             font_size: 12.0,
                             color: Color::WHITE,
                         },
