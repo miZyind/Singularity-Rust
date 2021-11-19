@@ -35,6 +35,9 @@ fn enter(
     mut materials: ResMut<Assets<ColorMaterial>>,
     assets: Res<AssetServer>,
 ) {
+    // TODO: ProgressBar integration
+    let _player: Handle<Scene> = assets.load("models/shiba/shiba.gltf#Scene0");
+
     let entity = commands
         .spawn_bundle(NodeBundle {
             style: Style {
@@ -177,15 +180,22 @@ fn update_image_transform(time: Res<Time>, mut query: Query<&mut Transform, With
     }
 }
 
-fn update_progress_bar(mut data: ResMut<Data>, mut query: Query<&mut Style, With<ProgressBar>>) {
+fn update_progress_bar(
+    mut data: ResMut<Data>,
+    mut query: Query<&mut Style, With<ProgressBar>>,
+    mut state: ResMut<bevy::ecs::schedule::State<AppState>>,
+) {
     if data.progress < 100.0 {
         for mut style in query.iter_mut() {
-            data.progress += 0.1;
+            data.progress += 0.5;
             style.size.width = Val::Percent(data.progress);
         }
+    } else {
+        state.set(AppState::InGame).unwrap();
     }
 }
 
 fn exit(mut commands: Commands, data: Res<Data>) {
     commands.entity(data.entity).despawn_recursive();
+    commands.remove_resource::<Data>();
 }

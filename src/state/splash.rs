@@ -1,8 +1,5 @@
 use super::AppState;
-use crate::{
-    constants::Color,
-    lib::{color::lerp, easing::Function},
-};
+use crate::{constants::Color, lib::easing::Function};
 use bevy::{asset::LoadState, prelude::*};
 
 pub struct State;

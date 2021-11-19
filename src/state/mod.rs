@@ -1,5 +1,6 @@
 use bevy::app::{PluginGroup, PluginGroupBuilder};
 
+mod in_game;
 mod loading;
 mod splash;
 
@@ -16,5 +17,6 @@ impl PluginGroup for Plugins {
     fn build(&mut self, group: &mut PluginGroupBuilder) {
         group.add(splash::State);
         group.add(loading::State);
+        group.add(in_game::State);
     }
 }
