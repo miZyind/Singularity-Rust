@@ -14,7 +14,8 @@ impl Plugin for State {
                     .with_system(update_alpha.system())
                     .with_system(update_text_color.system())
                     .with_system(update_image_transform.system())
-                    .with_system(update_progress_bar.system()),
+                    .with_system(update_progress_bar.system())
+                    .with_system(update_state.system()),
             )
             .add_system_set(SystemSet::on_exit(AppState::Loading).with_system(exit.system()));
     }
@@ -23,11 +24,16 @@ impl Plugin for State {
 struct Data {
     entity: Entity,
     progress: f32,
+    faded_in: bool,
 }
 struct Background;
 struct Title;
 struct Image;
 struct ProgressBar;
+struct Opaque;
+
+const FADE_DURATION: f32 = 1.0;
+const BLINK_DURATION: f32 = 2.0;
 
 fn enter(
     windows: Res<Windows>,
@@ -51,6 +57,8 @@ fn enter(
             material: materials.add(Color::BACKGROUND.into()),
             ..Default::default()
         })
+        .insert(Timer::from_seconds(FADE_DURATION, false))
+        .insert(Background)
         .with_children(|parent| {
             parent
                 .spawn_bundle(NodeBundle {
@@ -66,17 +74,16 @@ fn enter(
                     material: materials.add(Color::INACTIVE.into()),
                     ..Default::default()
                 })
-                .with_children(|outer_bar| {
-                    outer_bar
-                        .spawn_bundle(NodeBundle {
-                            style: Style {
-                                size: Size::new(Val::Percent(0.0), Val::Percent(100.0)),
-                                ..Default::default()
-                            },
-                            material: materials.add(Color::INFO.into()),
+                .with_children(|bar| {
+                    bar.spawn_bundle(NodeBundle {
+                        style: Style {
+                            size: Size::new(Val::Percent(0.0), Val::Percent(100.0)),
                             ..Default::default()
-                        })
-                        .insert(ProgressBar);
+                        },
+                        material: materials.add(Color::INFO.into()),
+                        ..Default::default()
+                    })
+                    .insert(ProgressBar);
                 });
 
             parent
@@ -96,7 +103,7 @@ fn enter(
                     ..Default::default()
                 })
                 .insert(Title)
-                .insert(Timer::from_seconds(2.0, true));
+                .insert(Timer::from_seconds(BLINK_DURATION, true));
 
             parent
                 .spawn_bundle(ImageBundle {
@@ -112,36 +119,57 @@ fn enter(
                     ..Default::default()
                 })
                 .insert(Image);
+
+            parent
+                .spawn_bundle(NodeBundle {
+                    style: Style {
+                        position_type: PositionType::Absolute,
+                        size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                        ..Default::default()
+                    },
+                    material: materials.add(Color::BLACK_TRANSPARENT.into()),
+                    ..Default::default()
+                })
+                .insert(Opaque);
         })
-        .insert(Timer::from_seconds(2.0, false))
-        .insert(Background)
         .id();
 
     commands.insert_resource(Data {
         entity,
         progress: 0.0,
+        faded_in: false,
     })
 }
 
 fn update_alpha(
     time: Res<Time>,
+    data: Res<Data>,
     mut background_query: Query<(&mut Timer, &Children), With<Background>>,
+    opaque_query: Query<&Handle<ColorMaterial>, With<Opaque>>,
     image_query: Query<&Handle<ColorMaterial>, With<Image>>,
     mut text_query: Query<&mut Text>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     if let Ok((mut timer, children)) = background_query.single_mut() {
-        timer.tick(time.delta());
+        if !timer.finished() {
+            timer.tick(time.delta());
 
-        for child in children.iter() {
             let alpha = Function::apply(Function::QuadraticIn(timer.percent()));
 
-            if let Ok(handle) = image_query.get(*child) {
-                materials.get_mut(handle).unwrap().color.set_a(alpha);
-            }
+            for child in children.iter() {
+                if data.faded_in {
+                    if let Ok(handle) = opaque_query.get(*child) {
+                        materials.get_mut(handle).unwrap().color.set_a(alpha);
+                    }
+                } else {
+                    if let Ok(handle) = image_query.get(*child) {
+                        materials.get_mut(handle).unwrap().color.set_a(alpha);
+                    }
 
-            if let Ok(mut text) = text_query.get_mut(*child) {
-                text.sections[0].style.color.set_a(alpha);
+                    if let Ok(mut text) = text_query.get_mut(*child) {
+                        text.sections[0].style.color.set_a(alpha);
+                    }
+                }
             }
         }
     }
@@ -149,24 +177,27 @@ fn update_alpha(
 
 fn update_text_color(
     time: Res<Time>,
+    data: Res<Data>,
     mut query: QuerySet<(
         Query<&Timer, With<Background>>,
         Query<(&mut Timer, &mut Text), With<Title>>,
     )>,
 ) {
-    if let Ok(timer) = query.q0().single() {
-        if timer.finished() {
-            if let Ok((mut timer, mut text)) = query.q1_mut().single_mut() {
-                timer.tick(time.delta());
-                text.sections[0].style.color = lerp(
-                    Color::FOREGROUND_PRIMARY,
-                    Color::FOREGROUND_SECONDARY,
-                    Function::QuadraticInOut(if timer.percent() < 0.5 {
-                        timer.percent()
-                    } else {
-                        timer.percent_left()
-                    }),
-                );
+    if !data.faded_in {
+        if let Ok(timer) = query.q0().single() {
+            if timer.finished() {
+                if let Ok((mut timer, mut text)) = query.q1_mut().single_mut() {
+                    timer.tick(time.delta());
+                    text.sections[0].style.color = lerp(
+                        Color::FOREGROUND_PRIMARY,
+                        Color::FOREGROUND_SECONDARY,
+                        Function::QuadraticInOut(if timer.percent() < 0.5 {
+                            timer.percent()
+                        } else {
+                            timer.percent_left()
+                        }),
+                    );
+                }
             }
         }
     }
@@ -183,15 +214,30 @@ fn update_image_transform(time: Res<Time>, mut query: Query<&mut Transform, With
 fn update_progress_bar(
     mut data: ResMut<Data>,
     mut query: Query<&mut Style, With<ProgressBar>>,
-    mut state: ResMut<bevy::ecs::schedule::State<AppState>>,
+    mut timer_query: Query<&mut Timer, With<Background>>,
 ) {
     if data.progress < 100.0 {
         for mut style in query.iter_mut() {
             data.progress += 0.5;
             style.size.width = Val::Percent(data.progress);
         }
-    } else {
-        state.set(AppState::InGame).unwrap();
+    } else if let Ok(mut timer) = timer_query.single_mut() {
+        if !data.faded_in && timer.finished() {
+            data.faded_in = true;
+            timer.reset();
+        }
+    }
+}
+
+fn update_state(
+    data: Res<Data>,
+    query: Query<&Timer, With<Background>>,
+    mut state: ResMut<bevy::ecs::schedule::State<AppState>>,
+) {
+    if let Ok(timer) = query.single() {
+        if data.faded_in && timer.just_finished() {
+            state.set(AppState::Menu).unwrap();
+        }
     }
 }
 

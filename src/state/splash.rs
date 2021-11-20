@@ -75,4 +75,5 @@ fn update(
 fn exit(mut commands: Commands, data: Res<Background>) {
     commands.entity(data.0).despawn_recursive();
     commands.remove_resource::<Handles>();
+    commands.remove_resource::<Background>();
 }

@@ -8,6 +8,8 @@ pub const PLAYER: u32 = 0b1;
 pub const GROUND: u32 = 0b10;
 pub struct Color;
 impl Color {
+    pub const BLACK: BevyColor = BevyColor::rgb(0.0, 0.0, 0.0);
+    pub const BLACK_TRANSPARENT: BevyColor = BevyColor::rgba(0.0, 0.0, 0.0, 0.0);
     // #140023 rgb(20, 0, 35)
     pub const BACKGROUND: BevyColor = BevyColor::rgb(0.07843, 0.00000, 0.13725);
     pub const BACKGROUND_TRANSPARENT: BevyColor = BevyColor::rgba(0.07843, 0.00000, 0.13725, 0.0);
