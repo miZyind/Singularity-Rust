@@ -1,6 +1,8 @@
 use bevy::render::color::Color as BevyColor;
 
 pub const APP_NAME: &str = "Singularity";
+pub const FONT_PATH: &str = "fonts/Endor.ttf";
+pub const LOGO_PATH: &str = "images/logo.png";
 pub const ZOON_MIN: f32 = 5.0;
 pub const ZOON_MAX: f32 = 10.0;
 pub const ZOOM_SENSITIVITY: f32 = 0.1;
@@ -8,7 +10,8 @@ pub const PLAYER: u32 = 0b1;
 pub const GROUND: u32 = 0b10;
 pub struct Color;
 impl Color {
-    pub const BLACK: BevyColor = BevyColor::rgb(0.0, 0.0, 0.0);
+    pub const WHITE: BevyColor = BevyColor::WHITE;
+    pub const BLACK: BevyColor = BevyColor::BLACK;
     pub const BLACK_TRANSPARENT: BevyColor = BevyColor::rgba(0.0, 0.0, 0.0, 0.0);
     // #140023 rgb(20, 0, 35)
     pub const BACKGROUND: BevyColor = BevyColor::rgb(0.07843, 0.00000, 0.13725);

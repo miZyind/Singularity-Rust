@@ -2,6 +2,7 @@ use super::AppState;
 use crate::{
     constants::{Color, APP_NAME},
     lib::{color::lerp, easing::Function, font::normalize},
+    resources::Global,
 };
 use bevy::prelude::*;
 
@@ -35,15 +36,7 @@ struct Opaque;
 const FADE_DURATION: f32 = 1.0;
 const BLINK_DURATION: f32 = 2.0;
 
-fn enter(
-    windows: Res<Windows>,
-    mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
-    assets: Res<AssetServer>,
-) {
-    // TODO: ProgressBar integration
-    let _player: Handle<Scene> = assets.load("models/shiba/shiba.gltf#Scene0");
-
+fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) {
     let entity = commands
         .spawn_bundle(NodeBundle {
             style: Style {
@@ -54,7 +47,7 @@ fn enter(
                 size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 ..Default::default()
             },
-            material: materials.add(Color::BACKGROUND.into()),
+            material: resources.colors.background.clone(),
             ..Default::default()
         })
         .insert(Timer::from_seconds(FADE_DURATION, false))
@@ -71,7 +64,7 @@ fn enter(
                         size: Size::new(Val::Percent(60.0), Val::Percent(2.0)),
                         ..Default::default()
                     },
-                    material: materials.add(Color::INACTIVE.into()),
+                    material: resources.colors.inactive.clone(),
                     ..Default::default()
                 })
                 .with_children(|bar| {
@@ -80,19 +73,18 @@ fn enter(
                             size: Size::new(Val::Percent(0.0), Val::Percent(100.0)),
                             ..Default::default()
                         },
-                        material: materials.add(Color::INFO.into()),
+                        material: resources.colors.info.clone(),
                         ..Default::default()
                     })
                     .insert(ProgressBar);
                 });
-
             parent
                 .spawn_bundle(TextBundle {
                     text: Text::with_section(
                         APP_NAME,
                         TextStyle {
-                            font: assets.load("fonts/Endor.ttf"),
-                            font_size: normalize(windows, 144),
+                            font: resources.font.clone(),
+                            font_size: normalize(&windows, 144.0),
                             color: Color::FOREGROUND_PRIMARY,
                         },
                         TextAlignment {
@@ -104,7 +96,6 @@ fn enter(
                 })
                 .insert(Title)
                 .insert(Timer::from_seconds(BLINK_DURATION, true));
-
             parent
                 .spawn_bundle(ImageBundle {
                     style: Style {
@@ -115,11 +106,10 @@ fn enter(
                         size: Size::new(Val::Auto, Val::Percent(30.0)),
                         ..Default::default()
                     },
-                    material: materials.add(assets.load("images/logo.png").into()),
+                    material: resources.logo.clone(),
                     ..Default::default()
                 })
                 .insert(Image);
-
             parent
                 .spawn_bundle(NodeBundle {
                     style: Style {
@@ -127,13 +117,12 @@ fn enter(
                         size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                         ..Default::default()
                     },
-                    material: materials.add(Color::BLACK_TRANSPARENT.into()),
+                    material: resources.colors.black_transparent.clone(),
                     ..Default::default()
                 })
                 .insert(Opaque);
         })
         .id();
-
     commands.insert_resource(Data {
         entity,
         progress: 0.0,
@@ -153,9 +142,7 @@ fn update_alpha(
     if let Ok((mut timer, children)) = background_query.single_mut() {
         if !timer.finished() {
             timer.tick(time.delta());
-
             let alpha = Function::apply(Function::QuadraticIn(timer.percent()));
-
             for child in children.iter() {
                 if data.faded_in {
                     if let Ok(handle) = opaque_query.get(*child) {
@@ -222,7 +209,7 @@ fn update_progress_bar(
             style.size.width = Val::Percent(data.progress);
         }
     } else if let Ok(mut timer) = timer_query.single_mut() {
-        if !data.faded_in && timer.finished() {
+        if !data.faded_in && timer.just_finished() {
             data.faded_in = true;
             timer.reset();
         }

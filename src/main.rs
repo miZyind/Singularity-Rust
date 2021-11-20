@@ -1,7 +1,9 @@
+mod bundles;
 mod camera;
 mod constants;
 mod lib;
 mod player;
+mod resources;
 mod state;
 mod world;
 
@@ -12,15 +14,19 @@ use bevy::prelude::*;
 use bevy_inspector_egui::WorldInspectorPlugin;
 use bevy_rapier3d::prelude::*;
 use lib::{diagnostics::DiagnosticsPlugin, rapier::RapierPlugin};
+use resources::Global;
 
 fn main() {
     let mut app = App::build();
 
     app.insert_resource(WindowDescriptor {
         title: constants::APP_NAME.to_string(),
+        width: 1600.0,
+        height: 900.0,
         ..Default::default()
     })
     .add_plugins(DefaultPlugins)
+    .init_resource::<Global>()
     .add_plugins(state::Plugins)
     .add_plugin(DiagnosticsPlugin)
     .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())

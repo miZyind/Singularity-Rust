@@ -1,5 +1,9 @@
 use super::AppState;
-use crate::{constants::Color, lib::easing::Function};
+use crate::{
+    constants::{FONT_PATH, LOGO_PATH},
+    lib::easing::Function,
+    resources::Global,
+};
 use bevy::{asset::LoadState, prelude::*};
 
 pub struct State;
@@ -18,13 +22,11 @@ struct Handles(Vec<HandleUntyped>);
 struct Background(Entity);
 
 fn enter(
-    assets: Res<AssetServer>,
-    mut handles: ResMut<Handles>,
     mut commands: Commands,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    resources: Res<Global>,
+    assets: Res<AssetServer>,
+    mut hs: ResMut<Handles>,
 ) {
-    let logo: Handle<Texture> = assets.load("fonts/Endor.ttf");
-    let font: Handle<Font> = assets.load("images/logo.png");
     let entity = commands
         .spawn_bundle(NodeBundle {
             style: Style {
@@ -35,14 +37,13 @@ fn enter(
                 size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 ..Default::default()
             },
-            material: materials.add(Color::BACKGROUND_TRANSPARENT.into()),
+            material: resources.colors.background_transparent.clone(),
             ..Default::default()
         })
         .insert(Timer::from_seconds(2.0, false))
         .id();
-
-    handles.0.push(logo.clone_untyped());
-    handles.0.push(font.clone_untyped());
+    hs.0.push((assets.load(FONT_PATH) as Handle<Font>).clone_untyped());
+    hs.0.push((assets.load(LOGO_PATH) as Handle<Texture>).clone_untyped());
     commands.spawn_bundle(UiCameraBundle::default());
     commands.insert_resource(Background(entity));
 }
@@ -64,7 +65,6 @@ fn update(
                 .unwrap()
                 .color
                 .set_a(Function::apply(Function::QuadraticIn(timer.percent())));
-
             if timer.finished() {
                 state.set(AppState::Loading).unwrap();
             }
