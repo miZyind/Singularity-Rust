@@ -10,6 +10,8 @@ impl Plugin for DiagnosticsPlugin {
         app.add_plugin(FrameTimeDiagnosticsPlugin::default())
             .add_startup_system(setup.system())
             .add_system(update.system());
+        #[cfg(all(feature = "native", feature = "debug"))]
+        app.add_startup_system(resize.system()).run();
     }
 }
 
@@ -56,4 +58,11 @@ fn update(diagnostics: Res<Diagnostics>, mut query: Query<&mut Text, With<FPSTex
             }
         }
     }
+}
+
+#[cfg(all(feature = "native", feature = "debug"))]
+fn resize(mut windows: ResMut<Windows>) {
+    let window = windows.get_primary_mut().unwrap();
+    window.set_resolution(400.0, 225.0);
+    window.set_position(IVec2::new(2782, 0));
 }
