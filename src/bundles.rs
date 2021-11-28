@@ -11,13 +11,18 @@ use bevy::{
     window::Windows,
 };
 
-pub fn spawn_logo_name<'a>(
+fn spawn_name(
     parent: &mut ChildBuilder,
     resources: &Res<Global>,
     windows: &Res<Windows>,
     size: f32,
+    margin: Rect<Val>,
 ) {
     parent.spawn_bundle(TextBundle {
+        style: Style {
+            margin,
+            ..Default::default()
+        },
         text: Text::with_section(
             APP_NAME,
             TextStyle {
@@ -32,6 +37,9 @@ pub fn spawn_logo_name<'a>(
         ),
         ..Default::default()
     });
+}
+
+fn spawn_logo(parent: &mut ChildBuilder, resources: &Res<Global>, size: f32) {
     parent.spawn_bundle(ImageBundle {
         style: Style {
             margin: Rect {
@@ -44,4 +52,25 @@ pub fn spawn_logo_name<'a>(
         material: resources.logo.clone(),
         ..Default::default()
     });
+}
+
+pub fn spawn_logo_name(
+    parent: &mut ChildBuilder,
+    resources: &Res<Global>,
+    windows: &Res<Windows>,
+    size: f32,
+) {
+    spawn_name(parent, resources, windows, size, Rect::default());
+    spawn_logo(parent, resources, size);
+}
+
+pub fn spawn_logo_name_with_margin(
+    parent: &mut ChildBuilder,
+    resources: &Res<Global>,
+    windows: &Res<Windows>,
+    size: f32,
+    margin: Rect<Val>,
+) {
+    spawn_name(parent, resources, windows, size, margin);
+    spawn_logo(parent, resources, size);
 }

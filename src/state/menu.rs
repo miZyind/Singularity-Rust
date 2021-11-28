@@ -1,5 +1,5 @@
 use super::AppState;
-use crate::{bundles::spawn_logo_name, resources::Global};
+use crate::{bundles::spawn_logo_name_with_margin, lib::font::normalize, resources::Global};
 use bevy::prelude::*;
 
 pub struct State;
@@ -33,8 +33,10 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                 flex_direction: FlexDirection::Column,
                 align_items: AlignItems::Center,
                 justify_content: JustifyContent::FlexEnd,
-                padding: Rect::all(Val::Percent(5.0)),
-
+                padding: Rect {
+                    top: Val::Percent(5.0),
+                    ..Default::default()
+                },
                 size: Size::new(Val::Percent(25.0), Val::Percent(100.0)),
                 ..Default::default()
             },
@@ -42,56 +44,112 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
             ..Default::default()
         })
         .with_children(|parent| {
-            // parent.spawn_bundle(TextBundle {
-            //     text: Text::with_section(
-            //         "Quit",
-            //         TextStyle {
-            //             font: resources.font.clone(),
-            //             font_size: 40.0,
-            //             ..Default::default()
-            //         },
-            //         Default::default(),
-            //     ),
-            //     ..Default::default()
-            // });
-            // parent.spawn_bundle(TextBundle {
-            //     text: Text::with_section(
-            //         "Settings",
-            //         TextStyle {
-            //             font: resources.font.clone(),
-            //             font_size: 40.0,
-            //             ..Default::default()
-            //         },
-            //         Default::default(),
-            //     ),
-            //     ..Default::default()
-            // });
-            // parent.spawn_bundle(TextBundle {
-            //     text: Text::with_section(
-            //         "Load",
-            //         TextStyle {
-            //             font: resources.font.clone(),
-            //             font_size: 40.0,
-            //             ..Default::default()
-            //         },
-            //         Default::default(),
-            //     ),
-            //     ..Default::default()
-            // });
-            // parent.spawn_bundle(TextBundle {
-            //     text: Text::with_section(
-            //         "New",
-            //         TextStyle {
-            //             font: resources.font.clone(),
-            //             font_size: 40.0,
-            //             ..Default::default()
-            //         },
-            //         Default::default(),
-            //     ),
-            //     ..Default::default()
-            // });
-
-            spawn_logo_name(parent, &resources, &windows, 108.0);
+            parent.spawn_bundle(TextBundle {
+                style: Style {
+                    margin: Rect {
+                        bottom: Val::Percent(10.0),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                },
+                text: Text::with_section(
+                    "Quit",
+                    TextStyle {
+                        font: resources.font.clone(),
+                        font_size: normalize(&windows, 60.0),
+                        ..Default::default()
+                    },
+                    Default::default(),
+                ),
+                ..Default::default()
+            });
+            parent.spawn_bundle(TextBundle {
+                style: Style {
+                    margin: Rect {
+                        bottom: Val::Percent(10.0),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                },
+                text: Text::with_section(
+                    "Settings",
+                    TextStyle {
+                        font: resources.font.clone(),
+                        font_size: normalize(&windows, 60.0),
+                        ..Default::default()
+                    },
+                    Default::default(),
+                ),
+                ..Default::default()
+            });
+            parent.spawn_bundle(TextBundle {
+                style: Style {
+                    margin: Rect {
+                        bottom: Val::Percent(10.0),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                },
+                text: Text::with_section(
+                    "Load",
+                    TextStyle {
+                        font: resources.font.clone(),
+                        font_size: normalize(&windows, 60.0),
+                        ..Default::default()
+                    },
+                    Default::default(),
+                ),
+                ..Default::default()
+            });
+            parent.spawn_bundle(TextBundle {
+                style: Style {
+                    margin: Rect {
+                        bottom: Val::Percent(10.0),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                },
+                text: Text::with_section(
+                    "New",
+                    TextStyle {
+                        font: resources.font.clone(),
+                        font_size: normalize(&windows, 60.0),
+                        ..Default::default()
+                    },
+                    Default::default(),
+                ),
+                ..Default::default()
+            });
+            spawn_logo_name_with_margin(
+                parent,
+                &resources,
+                &windows,
+                108.0,
+                Rect {
+                    bottom: Val::Percent(25.0),
+                    ..Default::default()
+                },
+            );
+            parent.spawn_bundle(TextBundle {
+                style: Style {
+                    position_type: PositionType::Absolute,
+                    position: Rect {
+                        bottom: Val::Px(0.0),
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                },
+                text: Text::with_section(
+                    "v2021-11-28",
+                    TextStyle {
+                        font: resources.font.clone(),
+                        font_size: normalize(&windows, 30.0),
+                        ..Default::default()
+                    },
+                    Default::default(),
+                ),
+                ..Default::default()
+            });
         })
         .id();
 
