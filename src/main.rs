@@ -7,6 +7,7 @@ mod resources;
 mod state;
 mod world;
 
+#[cfg(feature = "native")]
 use bevy::input::system::exit_on_esc_system;
 use bevy::prelude::*;
 #[cfg(feature = "debug")]
@@ -31,8 +32,9 @@ fn main() {
     .add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
     .add_plugin(RapierPlugin);
 
+    #[cfg(feature = "native")]
+    app.add_system(exit_on_esc_system);
     #[cfg(feature = "debug")]
     app.add_plugin(WorldInspectorPlugin::new());
-    app.add_system(exit_on_esc_system);
     app.run();
 }

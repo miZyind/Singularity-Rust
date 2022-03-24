@@ -1,27 +1,14 @@
-[env.release]
-RELEASE_ARGS = "-Z unstable-options --out-dir target/bin --release"
-
 [tasks.native]
-command = "cargo"
-args = ["build", "--features", "native", "@@split(RELEASE_ARGS, )"]
+script = "cargo build --features native -Z unstable-options --out-dir target/bin --release"
 
 [tasks.prepare-web-target]
-command = "rustup"
-args = ["target", "install", "wasm32-unknown-unknown"]
+script = "rustup target install wasm32-unknown-unknown"
 
 [tasks.prepare-web-cli]
-install_crate = { crate_name = "wasm-bindgen-cli", version = "0.2.69", binary = "wasm-bindgen", test_arg = "--help" }
+install_crate = { crate_name = "wasm-bindgen-cli", binary = "wasm-bindgen", test_arg = "--help" }
 
 [tasks.prepare-web]
-command = "cargo"
-args = [
-    "build",
-    "--features",
-    "web",
-    "--target",
-    "wasm32-unknown-unknown",
-    "--release",
-]
+script = "cargo build --target wasm32-unknown-unknown --release"
 dependencies = ["prepare-web-target", "prepare-web-cli"]
 
 [tasks.web]
