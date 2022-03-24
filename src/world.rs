@@ -29,15 +29,16 @@ pub fn spawn(
             ..Default::default()
         })
         .insert_bundle(RigidBodyBundle {
-            body_type: RigidBodyType::Static,
+            body_type: RigidBodyType::Static.into(),
             ..Default::default()
         })
         .insert_bundle(ColliderBundle {
-            shape: ColliderShape::cuboid(0.5 * box_xz, 0.5 * box_y, 0.5 * box_xz),
+            shape: ColliderShape::cuboid(0.5 * box_xz, 0.5 * box_y, 0.5 * box_xz).into(),
             flags: ColliderFlags {
                 collision_groups: InteractionGroups::all().with_memberships(constants::GROUND),
                 ..Default::default()
-            },
+            }
+            .into(),
             ..Default::default()
         });
     // cubes
@@ -49,16 +50,17 @@ pub fn spawn(
             ..Default::default()
         })
         .insert_bundle(RigidBodyBundle {
-            activation: RigidBodyActivation::cannot_sleep(),
-            body_type: RigidBodyType::Dynamic,
+            activation: RigidBodyActivation::cannot_sleep().into(),
+            body_type: RigidBodyType::Dynamic.into(),
             position: RigidBodyPosition {
                 position: Vec3::new(distance, 1.0, distance).into(),
                 ..Default::default()
-            },
+            }
+            .into(),
             ..Default::default()
         })
         .insert_bundle(ColliderBundle {
-            shape: ColliderShape::cuboid(0.5, 0.5, 0.5),
+            shape: ColliderShape::cuboid(0.5, 0.5, 0.5).into(),
             ..Default::default()
         })
         .insert(RigidBodyPositionSync::Discrete);
@@ -69,16 +71,17 @@ pub fn spawn(
             ..Default::default()
         })
         .insert_bundle(RigidBodyBundle {
-            activation: RigidBodyActivation::cannot_sleep(),
-            body_type: RigidBodyType::Dynamic,
+            activation: RigidBodyActivation::cannot_sleep().into(),
+            body_type: RigidBodyType::Dynamic.into(),
             position: RigidBodyPosition {
                 position: Vec3::new(distance, 1.0, -distance).into(),
                 ..Default::default()
-            },
+            }
+            .into(),
             ..Default::default()
         })
         .insert_bundle(ColliderBundle {
-            shape: ColliderShape::cuboid(0.5, 0.5, 0.5),
+            shape: ColliderShape::cuboid(0.5, 0.5, 0.5).into(),
             ..Default::default()
         })
         .insert(RigidBodyPositionSync::Discrete);
@@ -89,16 +92,17 @@ pub fn spawn(
             ..Default::default()
         })
         .insert_bundle(RigidBodyBundle {
-            activation: RigidBodyActivation::cannot_sleep(),
-            body_type: RigidBodyType::Dynamic,
+            activation: RigidBodyActivation::cannot_sleep().into(),
+            body_type: RigidBodyType::Dynamic.into(),
             position: RigidBodyPosition {
                 position: Vec3::new(-distance, 1.0, distance).into(),
                 ..Default::default()
-            },
+            }
+            .into(),
             ..Default::default()
         })
         .insert_bundle(ColliderBundle {
-            shape: ColliderShape::cuboid(0.5, 0.5, 0.5),
+            shape: ColliderShape::cuboid(0.5, 0.5, 0.5).into(),
             ..Default::default()
         })
         .insert(RigidBodyPositionSync::Discrete);
@@ -109,21 +113,22 @@ pub fn spawn(
             ..Default::default()
         })
         .insert_bundle(RigidBodyBundle {
-            activation: RigidBodyActivation::cannot_sleep(),
-            body_type: RigidBodyType::Dynamic,
+            activation: RigidBodyActivation::cannot_sleep().into(),
+            body_type: RigidBodyType::Dynamic.into(),
             position: RigidBodyPosition {
                 position: Vec3::new(-distance, 1.0, -distance).into(),
                 ..Default::default()
-            },
+            }
+            .into(),
             ..Default::default()
         })
         .insert_bundle(ColliderBundle {
-            shape: ColliderShape::cuboid(0.5, 0.5, 0.5),
+            shape: ColliderShape::cuboid(0.5, 0.5, 0.5).into(),
             ..Default::default()
         })
         .insert(RigidBodyPositionSync::Discrete);
     // light
-    commands.spawn_bundle(LightBundle {
+    commands.spawn_bundle(PointLightBundle {
         transform: Transform::from_xyz(0.0, 10.0, 0.0),
         ..Default::default()
     });

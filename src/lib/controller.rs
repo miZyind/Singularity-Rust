@@ -1,24 +1,25 @@
 use super::{events::*, inputs::*, look::*};
 use bevy::prelude::*;
 
+#[derive(Component)]
 pub struct BodyTag;
 pub struct ControllerPlugin;
 pub const INPUT_TO_EVENTS_SYSTEM: &str = "input_to_events";
 pub const INPUT_TO_LOOK_SYSTEM: &str = "input_to_look";
 
 impl Plugin for ControllerPlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.add_event::<LookEvent>()
             .add_event::<TranslationEvent>()
             .add_event::<ForceEvent>()
             .init_resource::<MouseSettings>()
             .add_system_to_stage(
                 CoreStage::PreUpdate,
-                input_to_events.system().label(INPUT_TO_EVENTS_SYSTEM),
+                input_to_events.label(INPUT_TO_EVENTS_SYSTEM),
             )
             .add_system_to_stage(
                 CoreStage::PreUpdate,
-                input_to_look.system().label(INPUT_TO_LOOK_SYSTEM),
+                input_to_look.label(INPUT_TO_LOOK_SYSTEM),
             );
     }
 }
@@ -33,6 +34,7 @@ pub struct InputState {
     pub run: bool,
 }
 
+#[derive(Component)]
 pub struct Controller {
     pub inputs: Inputs,
     pub walk_speed: f32,
@@ -60,7 +62,7 @@ impl Default for Controller {
         }
     }
 }
-
+#[derive(Component)]
 pub struct Mass {
     pub mass: f32,
 }
@@ -103,8 +105,7 @@ pub fn input_to_events(
         if controller.sim_to_render < controller.dt {
             continue;
         }
-        // Calculate the remaining simulation to render time after all
-        // simulation steps were taken
+        // Calculate the remaining simulation to render time after all simulation steps were taken
         controller.sim_to_render %= controller.dt;
         let (forward, right) = (
             transform.local_z().normalize(),

@@ -6,15 +6,15 @@ use bevy::{
 pub struct DiagnosticsPlugin;
 
 impl Plugin for DiagnosticsPlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.add_plugin(FrameTimeDiagnosticsPlugin::default())
-            .add_startup_system(setup.system())
-            .add_system(update.system());
-        #[cfg(all(feature = "native", feature = "debug"))]
-        app.add_startup_system(resize.system()).run();
+            .add_startup_system(setup)
+            .add_system(update);
+        #[cfg(feature = "debug")]
+        app.add_startup_system(resize).run();
     }
 }
-
+#[derive(Component)]
 struct FPSText;
 
 fn setup(mut commands: Commands, assets: Res<AssetServer>) {
@@ -60,7 +60,7 @@ fn update(diagnostics: Res<Diagnostics>, mut query: Query<&mut Text, With<FPSTex
     }
 }
 
-#[cfg(all(feature = "native", feature = "debug"))]
+#[cfg(feature = "debug")]
 fn resize(mut windows: ResMut<Windows>) {
     let window = windows.get_primary_mut().unwrap();
     window.set_resolution(400.0, 225.0);

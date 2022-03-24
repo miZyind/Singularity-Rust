@@ -1,11 +1,13 @@
 use super::AppState;
-use crate::{bundles::spawn_logo_name_with_margin, lib::font::normalize, resources::Global};
+use crate::{
+    bundles::spawn_logo_name_with_margin, constants::Theme, lib::font::normalize, resources::Global,
+};
 use bevy::prelude::*;
 
 pub struct State;
 impl Plugin for State {
-    fn build(&self, app: &mut AppBuilder) {
-        app.add_system_set(SystemSet::on_enter(AppState::Menu).with_system(enter.system()));
+    fn build(&self, app: &mut App) {
+        app.add_system_set(SystemSet::on_enter(AppState::Menu).with_system(enter));
     }
 }
 
@@ -23,7 +25,7 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                 size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 ..Default::default()
             },
-            material: resources.colors.black.clone(),
+            color: Theme::BLACK.into(),
             ..Default::default()
         })
         .id();
@@ -40,7 +42,7 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                 size: Size::new(Val::Percent(25.0), Val::Percent(100.0)),
                 ..Default::default()
             },
-            material: resources.colors.background.clone(),
+            color: Theme::BACKGROUND.into(),
             ..Default::default()
         })
         .with_children(|parent| {

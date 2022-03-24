@@ -5,6 +5,7 @@ use std::f32::EPSILON;
 const FOUNDATION_POINT: Vec3 = Vec3::ZERO;
 const FOUNDATION_NORMAL: Vec3 = Vec3::Y;
 
+#[derive(Component)]
 pub struct LookCamera;
 
 pub struct MouseSettings {
@@ -51,7 +52,7 @@ pub fn input_to_look(
     mut look_writer: EventWriter<LookEvent>,
 ) {
     for cursor in cursor_reader.iter() {
-        if let Ok((camera, camera_transform)) = query.single() {
+        if let Ok((camera, camera_transform)) = query.get_single() {
             if let Some(world_cursor_position) =
                 screen_to_world(&windows, camera, camera_transform, cursor.position)
             {

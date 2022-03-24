@@ -10,41 +10,37 @@ pub const CREATE_MASS_FROM_RAPIER_SYSTEM: &str = "create_mass_from_rapier";
 pub struct RapierPlugin;
 
 impl Plugin for RapierPlugin {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.add_plugin(ControllerPlugin)
-            .add_system(
-                create_mass_from_rapier
-                    .system()
-                    .label(CREATE_MASS_FROM_RAPIER_SYSTEM),
-            )
-            .add_system(body_to_rotation.system().label(BODY_TO_ROTATION_SYSTEM))
+            .add_system(create_mass_from_rapier.label(CREATE_MASS_FROM_RAPIER_SYSTEM))
+            .add_system(body_to_rotation.label(BODY_TO_ROTATION_SYSTEM))
             .add_system(
                 body_to_velocity
-                    .system()
                     .label(BODY_TO_VELOCITY_SYSTEM)
                     .after(BODY_TO_ROTATION_SYSTEM),
             )
             .add_system(
                 controller_to_rapier_dynamic_force
-                    .system()
                     .label(CONTROLLER_TO_RAPIER_DYNAMIC_FORCE_SYSTEM)
                     .after(BODY_TO_VELOCITY_SYSTEM),
             )
-            .add_system(controller_to_kinematic.system());
+            .add_system(controller_to_kinematic);
     }
 }
 
 pub fn create_mass_from_rapier(
     mut commands: Commands,
-    query: Query<(Entity, &RigidBodyMassProps), Without<Mass>>,
+    query: Query<(Entity, &RigidBodyMassPropsComponent), Without<Mass>>,
 ) {
     for (entity, mass_props) in query.iter() {
-        let mass = 1.0 / mass_props.effective_inv_mass;
+        let mass = 1.0 / mass_props.mass();
         commands.entity(entity).insert(Mass::new(mass));
     }
 }
 
-pub fn body_to_velocity(mut query: Query<(&RigidBodyVelocity, &mut Controller), With<BodyTag>>) {
+pub fn body_to_velocity(
+    mut query: Query<(&RigidBodyVelocityComponent, &mut Controller), With<BodyTag>>,
+) {
     for (velocity, mut controller) in query.iter_mut() {
         controller.velocity = velocity.linvel.into();
     }
@@ -52,7 +48,7 @@ pub fn body_to_velocity(mut query: Query<(&RigidBodyVelocity, &mut Controller), 
 
 pub fn body_to_rotation(
     mut look_reader: EventReader<LookEvent>,
-    mut query: Query<(&Transform, &mut RigidBodyPosition), With<BodyTag>>,
+    mut query: Query<(&Transform, &mut RigidBodyPositionComponent), With<BodyTag>>,
 ) {
     for event in look_reader.iter() {
         for (transform, mut positions) in query.iter_mut() {
@@ -63,10 +59,10 @@ pub fn body_to_rotation(
             );
             let right = up.cross(forward).normalize();
             let up = forward.cross(right);
-            let rotation = Quat::from_rotation_mat3(&Mat3::from_cols(right, up, forward));
+            let rotation = Quat::from_mat3(&Mat3::from_cols(right, up, forward));
             if !Quat::is_nan(rotation) {
                 positions.position.rotation =
-                    Quat::from_rotation_mat3(&Mat3::from_cols(right, up, forward)).into();
+                    Quat::from_mat3(&Mat3::from_cols(right, up, forward)).into();
             }
         }
     }
@@ -74,7 +70,13 @@ pub fn body_to_rotation(
 
 pub fn controller_to_rapier_dynamic_force(
     mut force_reader: EventReader<ForceEvent>,
-    mut query: Query<(&mut RigidBodyForces, &mut RigidBodyActivation), With<BodyTag>>,
+    mut query: Query<
+        (
+            &mut RigidBodyForcesComponent,
+            &mut RigidBodyActivationComponent,
+        ),
+        With<BodyTag>,
+    >,
 ) {
     let mut force = Vec3::ZERO;
     for event in force_reader.iter() {

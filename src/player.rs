@@ -16,16 +16,17 @@ pub fn spawn(mut commands: Commands, assets: Res<AssetServer>) {
             mass_properties: (RigidBodyMassPropsFlags::ROTATION_LOCKED_X
                 | RigidBodyMassPropsFlags::ROTATION_LOCKED_Z)
                 .into(),
-            activation: RigidBodyActivation::cannot_sleep(),
+            activation: RigidBodyActivation::cannot_sleep().into(),
             ..Default::default()
         })
         .insert_bundle(ColliderBundle {
-            shape: ColliderShape::cuboid(0.5, 1.0, 0.5),
-            mass_properties: ColliderMassProps::Density(1.0),
+            shape: ColliderShape::cuboid(0.5, 1.0, 0.5).into(),
+            mass_properties: ColliderMassProps::Density(1.0).into(),
             flags: ColliderFlags {
                 collision_groups: InteractionGroups::all().with_memberships(constants::PLAYER),
                 ..Default::default()
-            },
+            }
+            .into(),
             ..Default::default()
         })
         .insert(RigidBodyPositionSync::Discrete)

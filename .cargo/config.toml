@@ -8,8 +8,6 @@ debug = 1
 lto = "thin"
 
 [alias]
-n = "run --features native"
-nd = "run --features native,debug"
-w = "watch -x run --features native"
-wd = "watch -x run --features native,debug"
+d = "run --features debug"
+wd = "watch -x run --features debug"
 m = "make web"

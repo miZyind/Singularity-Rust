@@ -5,13 +5,13 @@ use bevy::prelude::*;
 
 pub struct State;
 impl Plugin for State {
-    fn build(&self, app: &mut AppBuilder) {
+    fn build(&self, app: &mut App) {
         app.add_system_set(
             SystemSet::on_enter(AppState::InGame)
-                .with_system(world::spawn.system())
-                .with_system(player::spawn.system())
-                .with_system(camera::spawn.system()),
+                .with_system(world::spawn)
+                .with_system(player::spawn)
+                .with_system(camera::spawn),
         )
-        .add_system_set(SystemSet::on_update(AppState::InGame).with_system(camera::zoom.system()));
+        .add_system_set(SystemSet::on_update(AppState::InGame).with_system(camera::zoom));
     }
 }

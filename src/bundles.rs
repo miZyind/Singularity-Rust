@@ -1,5 +1,5 @@
 use crate::{
-    constants::{Color, APP_NAME},
+    constants::{Theme, APP_NAME},
     lib::font::normalize,
     resources::Global,
 };
@@ -28,7 +28,7 @@ fn spawn_name(
             TextStyle {
                 font: resources.font.clone(),
                 font_size: normalize(windows, size),
-                color: Color::FOREGROUND_SECONDARY,
+                color: Theme::FOREGROUND_SECONDARY,
             },
             TextAlignment {
                 vertical: VerticalAlign::Center,
@@ -49,7 +49,7 @@ fn spawn_logo(parent: &mut ChildBuilder, resources: &Res<Global>, size: f32) {
             size: Size::new(Val::Auto, Val::Percent(size / 4.8)),
             ..Default::default()
         },
-        material: resources.logo.clone(),
+        image: resources.logo.clone().into(),
         ..Default::default()
     });
 }

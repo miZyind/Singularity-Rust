@@ -18,10 +18,9 @@ pub fn zoom(
     mut query: Query<(&Camera, &mut OrthographicProjection), With<LookCamera>>,
 ) {
     for mouse_wheel in mouse_wheel_reader.iter() {
-        if let Ok((_, mut projection)) = query.single_mut() {
-            let zoom_scalar = 1.0 - constants::ZOOM_SENSITIVITY * mouse_wheel.y;
-            let zoomed = projection.scale * zoom_scalar;
-            projection.scale = zoomed.max(constants::ZOON_MIN).min(constants::ZOON_MAX);
-        }
+        let (_, mut projection) = query.single_mut();
+        let zoom_scalar = 1.0 - constants::ZOOM_SENSITIVITY * mouse_wheel.y;
+        let zoomed = projection.scale * zoom_scalar;
+        projection.scale = zoomed.max(constants::ZOON_MIN).min(constants::ZOON_MAX);
     }
 }
