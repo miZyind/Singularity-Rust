@@ -1,5 +1,5 @@
 [tasks.native]
-script = "cargo build --features native -Z unstable-options --out-dir target/bin --release"
+script = "cargo build --release"
 
 [tasks.prepare-web-target]
 script = "rustup target install wasm32-unknown-unknown"

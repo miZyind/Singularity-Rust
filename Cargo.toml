@@ -1,14 +1,21 @@
 [package]
 name = "singularity"
 version = "0.1.0"
+authors = ["miZyind <mizyind@gmail.com>"]
 edition = "2021"
-
-[features]
-default = ["bevy/bevy_gltf", "bevy/png", "bevy/render", "bevy/bevy_winit"]
-native = ["bevy/dynamic"]
-debug = ["bevy-inspector-egui"]
+homepage = "https://mizyind.dev/singularity"
+repository = "https://github.com/miZyind/singularity"
+license = "MIT"
+keywords = ["game", "bevy"]
 
 [dependencies]
-bevy = { version = "0.6.1", default-features = false }
+bevy = { version = "0.6.1", default-features = false, features = [
+    "bevy_winit",
+    "png",
+] }
 bevy_rapier3d = "0.12.1"
 bevy-inspector-egui = { version = "0.9", optional = true }
+
+[profile.release]
+opt-level = "z"
+lto = true
