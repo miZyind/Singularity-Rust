@@ -1,7 +1,5 @@
 use super::AppState;
-use crate::{
-    bundles::spawn_logo_name_with_margin, constants::Theme, lib::font::normalize, resources::Global,
-};
+use crate::{constants::Theme, lib::font::normalize, resources::Global};
 use bevy::prelude::*;
 
 pub struct State;
@@ -9,11 +7,6 @@ impl Plugin for State {
     fn build(&self, app: &mut App) {
         app.add_system_set(SystemSet::on_enter(AppState::Menu).with_system(enter));
     }
-}
-
-struct Data {
-    background_entity: Entity,
-    menu_background_entity: Entity,
 }
 
 fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) {
@@ -122,16 +115,16 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                 ),
                 ..Default::default()
             });
-            spawn_logo_name_with_margin(
-                parent,
-                &resources,
-                &windows,
-                108.0,
-                Rect {
-                    bottom: Val::Percent(25.0),
-                    ..Default::default()
-                },
-            );
+            // spawn_logo_name_with_margin(
+            //     parent,
+            //     &resources,
+            //     &windows,
+            //     108.0,
+            //     Rect {
+            //         bottom: Val::Percent(25.0),
+            //         ..Default::default()
+            //     },
+            // );
             parent.spawn_bundle(TextBundle {
                 style: Style {
                     position_type: PositionType::Absolute,
@@ -158,8 +151,4 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
     commands
         .entity(background_entity)
         .push_children(&[menu_background_entity]);
-    commands.insert_resource(Data {
-        background_entity,
-        menu_background_entity,
-    })
 }
