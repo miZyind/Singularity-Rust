@@ -1,3 +1,4 @@
+#![allow(dead_code)]
 use bevy::prelude::Color;
 
 pub const APP_NAME: &str = "Singularity";
