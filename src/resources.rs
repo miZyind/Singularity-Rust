@@ -1,8 +1,8 @@
-use crate::constants::{FONT_PATH, LOGO_PATH};
-use bevy::{
-    prelude::{AssetServer, FromWorld, Handle, Image, World},
-    text::Font,
-};
+use crate::constants::PATH;
+use bevy::{prelude::*, text::Font};
+
+#[derive(Component)]
+struct MyComponent {}
 
 pub struct Global {
     pub font: Handle<Font>,
@@ -13,8 +13,8 @@ impl FromWorld for Global {
         let world = world.cell();
         let assets = world.get_resource_mut::<AssetServer>().unwrap();
         Global {
-            font: assets.load(FONT_PATH),
-            logo: assets.load(LOGO_PATH),
+            font: assets.load(PATH::FONT),
+            logo: assets.load(PATH::LOGO),
         }
     }
 }

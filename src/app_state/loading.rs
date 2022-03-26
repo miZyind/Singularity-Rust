@@ -1,6 +1,6 @@
 use super::AppState;
 use crate::{
-    constants::{Theme, APP_NAME},
+    constants::{APP_NAME, COLOR},
     lib::{color::lerp, easing::Function, font::normalize},
     resources::Global,
 };
@@ -52,7 +52,7 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                 size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 ..Default::default()
             },
-            color: Theme::BACKGROUND.into(),
+            color: COLOR::BACKGROUND.into(),
             ..Default::default()
         })
         .insert(Timer::from_seconds(FADE_DURATION, false))
@@ -69,7 +69,7 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                         size: Size::new(Val::Percent(60.0), Val::Percent(2.0)),
                         ..Default::default()
                     },
-                    color: Theme::INACTIVE.into(),
+                    color: COLOR::INACTIVE.into(),
                     ..Default::default()
                 })
                 .with_children(|bar| {
@@ -78,7 +78,7 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                             size: Size::new(Val::Percent(0.0), Val::Percent(100.0)),
                             ..Default::default()
                         },
-                        color: Theme::INFO.into(),
+                        color: COLOR::INFO.into(),
                         ..Default::default()
                     })
                     .insert(ProgressBar);
@@ -90,7 +90,7 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                         TextStyle {
                             font: resources.font.clone(),
                             font_size: normalize(&windows, 144.0),
-                            color: Theme::FOREGROUND_PRIMARY,
+                            color: COLOR::FOREGROUND_PRIMARY,
                         },
                         TextAlignment {
                             vertical: VerticalAlign::Center,
@@ -122,7 +122,7 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                         size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                         ..Default::default()
                     },
-                    color: Theme::BLACK_TRANSPARENT.into(),
+                    color: COLOR::BLACK_TRANSPARENT.into(),
                     ..Default::default()
                 })
                 .insert(Opaque);
@@ -180,8 +180,8 @@ fn update_text_color(
             let (mut timer, mut text) = query.single_mut();
             timer.tick(time.delta());
             text.sections[0].style.color = lerp(
-                Theme::FOREGROUND_PRIMARY,
-                Theme::FOREGROUND_SECONDARY,
+                COLOR::FOREGROUND_PRIMARY,
+                COLOR::FOREGROUND_SECONDARY,
                 Function::QuadraticInOut(if timer.percent() < 0.5 {
                     timer.percent()
                 } else {

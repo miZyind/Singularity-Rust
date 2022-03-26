@@ -1,5 +1,5 @@
 use super::AppState;
-use crate::{constants::Theme, lib::font::normalize, resources::Global};
+use crate::{constants::COLOR, lib::font::normalize, resources::Global};
 use bevy::prelude::*;
 
 pub struct State;
@@ -18,7 +18,7 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                 size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                 ..Default::default()
             },
-            color: Theme::BLACK.into(),
+            color: COLOR::BLACK.into(),
             ..Default::default()
         })
         .id();
@@ -35,7 +35,7 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                 size: Size::new(Val::Percent(25.0), Val::Percent(100.0)),
                 ..Default::default()
             },
-            color: Theme::BACKGROUND.into(),
+            color: COLOR::BACKGROUND.into(),
             ..Default::default()
         })
         .with_children(|parent| {
