@@ -1,3 +1,4 @@
+pub mod animation;
 pub mod color;
 pub mod controller;
 pub mod diagnostics;
