@@ -1,10 +1,11 @@
 use super::AppState;
 use crate::{
     constants::{APP_NAME, COLOR},
-    lib::{color::lerp, easing::Function, font::normalize},
+    lib::font::normalize,
     resources::Global,
 };
 use bevy::prelude::*;
+use bevy_ui_animation::{Animation, Ease, TextColor, TransformRotation, Vars};
 
 pub struct State;
 impl Plugin for State {
@@ -12,9 +13,6 @@ impl Plugin for State {
         app.add_system_set(SystemSet::on_enter(AppState::Loading).with_system(enter))
             .add_system_set(
                 SystemSet::on_update(AppState::Loading)
-                    .with_system(update_alpha)
-                    .with_system(update_text_color)
-                    .with_system(update_image_transform)
                     .with_system(update_progress_bar)
                     .with_system(update_state),
             )
@@ -25,21 +23,9 @@ impl Plugin for State {
 struct Data {
     entity: Entity,
     progress: f32,
-    faded_in: bool,
 }
 #[derive(Component)]
-struct Background;
-#[derive(Component)]
-struct Title;
-#[derive(Component)]
-struct Image;
-#[derive(Component)]
 struct ProgressBar;
-#[derive(Component)]
-struct Opaque;
-
-const FADE_DURATION: f32 = 1.0;
-const BLINK_DURATION: f32 = 2.0;
 
 fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) {
     let entity = commands
@@ -55,8 +41,6 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
             color: COLOR::BACKGROUND.into(),
             ..Default::default()
         })
-        .insert(Timer::from_seconds(FADE_DURATION, false))
-        .insert(Background)
         .with_children(|parent| {
             parent
                 .spawn_bundle(NodeBundle {
@@ -99,8 +83,17 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                     ),
                     ..Default::default()
                 })
-                .insert(Title)
-                .insert(Timer::from_seconds(BLINK_DURATION, true));
+                .insert(Animation::new(Vars {
+                    text_color: Some(TextColor {
+                        target: COLOR::FOREGROUND_SECONDARY,
+                        section: 0,
+                    }),
+                    duration: 2.0,
+                    ease: Ease::PowerIn,
+                    repeat: true,
+                    yoyo: true,
+                    ..Default::default()
+                }));
             parent
                 .spawn_bundle(ImageBundle {
                     style: Style {
@@ -114,7 +107,13 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                     image: resources.logo.clone().into(),
                     ..Default::default()
                 })
-                .insert(Image);
+                .insert(Animation::new(Vars {
+                    transform_rotation: Some(TransformRotation::z(360.0)),
+                    duration: 60.0,
+                    ease: Ease::Linear,
+                    repeat: true,
+                    ..Default::default()
+                }));
             parent
                 .spawn_bundle(NodeBundle {
                     style: Style {
@@ -122,109 +121,34 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                         size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                         ..Default::default()
                     },
-                    color: COLOR::BLACK_TRANSPARENT.into(),
+                    color: COLOR::BLACK.into(),
                     ..Default::default()
                 })
-                .insert(Opaque);
+                .insert(Animation::new(Vars {
+                    color: Some(UiColor(COLOR::BLACK_TRANSPARENT)),
+                    duration: 2.0,
+                    ease: Ease::PowerIn,
+                    ..Default::default()
+                }));
         })
         .id();
     commands.insert_resource(Data {
         entity,
         progress: 0.0,
-        faded_in: false,
     })
 }
 
-fn update_alpha(
-    time: Res<Time>,
-    data: Res<Data>,
-    mut background_query: Query<(&mut Timer, &Children), With<Background>>,
-    mut queries: QuerySet<(
-        QueryState<&mut UiColor, With<Opaque>>,
-        QueryState<&mut UiColor, With<Image>>,
-    )>,
-    mut text_query: Query<&mut Text>,
-) {
-    let (mut timer, children) = background_query.single_mut();
-    if !timer.finished() {
-        timer.tick(time.delta());
-        let alpha = Function::apply(Function::QuadraticIn(timer.percent()));
-        for child in children.iter() {
-            if data.faded_in {
-                if let Ok(mut color) = queries.q0().get_mut(*child) {
-                    color.0.set_a(alpha);
-                }
-            } else {
-                if let Ok(mut color) = queries.q1().get_mut(*child) {
-                    color.0.set_a(alpha);
-                }
-                if let Ok(mut text) = text_query.get_mut(*child) {
-                    text.sections[0].style.color.set_a(alpha);
-                }
-            }
-        }
-    }
-}
-
-fn update_text_color(
-    time: Res<Time>,
-    data: Res<Data>,
-    mut queries: QuerySet<(
-        QueryState<&Timer, With<Background>>,
-        QueryState<(&mut Timer, &mut Text), With<Title>>,
-    )>,
-) {
-    if !data.faded_in {
-        if queries.q0().single().finished() {
-            let mut query = queries.q1();
-            let (mut timer, mut text) = query.single_mut();
-            timer.tick(time.delta());
-            text.sections[0].style.color = lerp(
-                COLOR::FOREGROUND_PRIMARY,
-                COLOR::FOREGROUND_SECONDARY,
-                Function::QuadraticInOut(if timer.percent() < 0.5 {
-                    timer.percent()
-                } else {
-                    timer.percent_left()
-                }),
-            );
-        }
-    }
-}
-
-fn update_image_transform(time: Res<Time>, mut query: Query<&mut Transform, With<Image>>) {
-    for mut transform in query.iter_mut() {
-        transform.rotate(Quat::from_rotation_z(
-            -std::f32::consts::PI / 60.0 * time.delta_seconds(),
-        ));
-    }
-}
-
-fn update_progress_bar(
-    mut data: ResMut<Data>,
-    mut query: Query<&mut Style, With<ProgressBar>>,
-    mut timer_query: Query<&mut Timer, With<Background>>,
-) {
+fn update_progress_bar(mut data: ResMut<Data>, mut query: Query<&mut Style, With<ProgressBar>>) {
     if data.progress < 100.0 {
         for mut style in query.iter_mut() {
             data.progress += 0.5;
             style.size.width = Val::Percent(data.progress);
         }
-    } else {
-        let mut timer = timer_query.single_mut();
-        if !data.faded_in && timer.just_finished() {
-            data.faded_in = true;
-            timer.reset();
-        }
     }
 }
 
-fn update_state(
-    data: Res<Data>,
-    query: Query<&Timer, With<Background>>,
-    mut state: ResMut<bevy::ecs::schedule::State<AppState>>,
-) {
-    if data.faded_in && query.single().just_finished() {
+fn update_state(data: Res<Data>, mut state: ResMut<bevy::ecs::schedule::State<AppState>>) {
+    if data.progress == 100.0 {
         state.set(AppState::Menu).unwrap();
     }
 }

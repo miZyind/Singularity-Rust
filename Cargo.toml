@@ -15,6 +15,7 @@ bevy = { version = "0.6.1", default-features = false, features = [
 ] }
 bevy_rapier3d = "0.12.1"
 bevy-inspector-egui = { version = "0.9", optional = true }
+bevy_ui_animation = { git = "https://github.com/mizyind/bevy_ui_animation" }
 
 [profile.release]
 opt-level = "z"

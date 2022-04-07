@@ -703,6 +703,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "bevy_ui_animation"
+version = "0.0.0"
+source = "git+https://github.com/mizyind/bevy_ui_animation#767ac6323d4104a3513f0eed5a90a97440819720"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bevy_utils"
 version = "0.6.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2440,6 +2448,7 @@ dependencies = [
  "bevy",
  "bevy-inspector-egui",
  "bevy_rapier3d",
+ "bevy_ui_animation",
 ]
 
 [[package]]
