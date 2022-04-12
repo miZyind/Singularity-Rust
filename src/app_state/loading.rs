@@ -5,7 +5,7 @@ use crate::{
     resources::Global,
 };
 use bevy::prelude::*;
-use bevy_ui_animation::{Animation, Ease, TextColor, TransformRotation, Vars};
+use bevy_ui_animation::*;
 
 pub struct State;
 impl Plugin for State {
@@ -14,6 +14,7 @@ impl Plugin for State {
             .add_system_set(
                 SystemSet::on_update(AppState::Loading)
                     .with_system(update_progress_bar)
+                    .with_system(update_opaque)
                     .with_system(update_state),
             )
             .add_system_set(SystemSet::on_exit(AppState::Loading).with_system(exit));
@@ -23,9 +24,12 @@ impl Plugin for State {
 struct Data {
     entity: Entity,
     progress: f32,
+    loaded: bool,
 }
 #[derive(Component)]
 struct ProgressBar;
+#[derive(Component)]
+struct Opaque;
 
 fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) {
     let entity = commands
@@ -88,7 +92,7 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                         target: COLOR::FOREGROUND_SECONDARY,
                         section: 0,
                     }),
-                    duration: 2.0,
+                    duration: 1.0,
                     ease: Ease::PowerIn,
                     repeat: true,
                     yoyo: true,
@@ -130,11 +134,28 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                     ease: Ease::PowerIn,
                     ..Default::default()
                 }));
+            parent
+                .spawn_bundle(NodeBundle {
+                    style: Style {
+                        position_type: PositionType::Absolute,
+                        size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
+                        ..Default::default()
+                    },
+                    color: COLOR::BLACK_TRANSPARENT.into(),
+                    ..Default::default()
+                })
+                .insert(Animation::new(Vars {
+                    color: Some(UiColor(COLOR::BLACK)),
+                    paused: true,
+                    ..Default::default()
+                }))
+                .insert(Opaque);
         })
         .id();
     commands.insert_resource(Data {
         entity,
         progress: 0.0,
+        loaded: false,
     })
 }
 
@@ -147,9 +168,31 @@ fn update_progress_bar(mut data: ResMut<Data>, mut query: Query<&mut Style, With
     }
 }
 
-fn update_state(data: Res<Data>, mut state: ResMut<bevy::ecs::schedule::State<AppState>>) {
-    if data.progress == 100.0 {
-        state.set(AppState::Menu).unwrap();
+fn update_opaque(mut data: ResMut<Data>, mut query: Query<&mut Animation, With<Opaque>>) {
+    if !data.loaded && data.progress == 100.0 {
+        data.loaded = true;
+        if let Ok(mut animation) = query.get_single_mut() {
+            if animation.paused() {
+                animation.play();
+            }
+        }
+    }
+}
+
+fn update_state(
+    data: Res<Data>,
+    mut query: Query<Entity, With<Opaque>>,
+    mut complete_events: EventReader<CompleteEvent>,
+    mut state: ResMut<bevy::ecs::schedule::State<AppState>>,
+) {
+    if data.loaded {
+        if let Ok(entity) = query.get_single_mut() {
+            for event in complete_events.iter() {
+                if entity.id() == event.entity.id() {
+                    state.set(AppState::Menu).unwrap();
+                }
+            }
+        }
     }
 }
 
