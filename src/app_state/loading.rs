@@ -121,11 +121,11 @@ fn enter(mut commands: Commands, resources: Res<Global>, windows: Res<Windows>) 
                         size: Size::new(Val::Percent(100.0), Val::Percent(100.0)),
                         ..Default::default()
                     },
-                    color: COLOR::BLACK.into(),
+                    color: COLOR::BACKGROUND.into(),
                     ..Default::default()
                 })
                 .insert(Animation::new(Vars {
-                    color: Some(UiColor(COLOR::BLACK_TRANSPARENT)),
+                    color: Some(UiColor(COLOR::BACKGROUND_TRANSPARENT)),
                     duration: 2.0,
                     ease: Ease::PowerIn,
                     ..Default::default()

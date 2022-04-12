@@ -705,7 +705,7 @@ dependencies = [
 [[package]]
 name = "bevy_ui_animation"
 version = "0.0.0"
-source = "git+https://github.com/mizyind/bevy_ui_animation#767ac6323d4104a3513f0eed5a90a97440819720"
+source = "git+https://github.com/mizyind/bevy_ui_animation#675ea791f5a7f58ccceda48c0f072151d1edb15b"
 dependencies = [
  "bevy",
 ]
