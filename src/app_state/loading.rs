@@ -100,7 +100,5 @@ fn update(counter: Res<ProgressCounter>, mut query: Query<&mut Style, With<Progr
 }
 
 fn exit(mut commands: Commands, query: Query<Entity, With<MainUI>>) {
-    let entity = query.single();
-
-    commands.entity(entity).despawn_recursive();
+    commands.entity(query.single()).despawn_recursive();
 }
