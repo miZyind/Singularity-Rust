@@ -27,10 +27,13 @@ fn screen_to_world(
 ) -> Option<Vec3> {
     let window = windows.get_primary().unwrap();
     let screen_size = Vec2::from([window.width(), window.height()]);
-    let cursor_ndc = (cursor_pos / screen_size) * 2.0 - Vec2::from([1.0, 1.0]);
-    let ndc_to_world: Mat4 = camera_transform.compute_matrix() * camera.projection_matrix.inverse();
-    let cursor_pos_near = ndc_to_world.project_point3(cursor_ndc.extend(-1.0));
-    let cursor_pos_far = ndc_to_world.project_point3(cursor_ndc.extend(1.0));
+    let projection = camera.projection_matrix();
+    let far_ndc = projection.project_point3(Vec3::NEG_Z).z;
+    let near_ndc = projection.project_point3(Vec3::Z).z;
+    let cursor_ndc = (cursor_pos / screen_size) * 2.0 - Vec2::ONE;
+    let ndc_to_world: Mat4 = camera_transform.compute_matrix() * projection.inverse();
+    let cursor_pos_near = ndc_to_world.project_point3(cursor_ndc.extend(near_ndc));
+    let cursor_pos_far = ndc_to_world.project_point3(cursor_ndc.extend(far_ndc));
     let ray_direction = cursor_pos_far - cursor_pos_near;
     let d = ray_direction.dot(FOUNDATION_NORMAL);
 

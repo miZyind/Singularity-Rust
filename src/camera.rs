@@ -1,16 +1,11 @@
 use crate::{constants, lib::look::LookCamera};
-use bevy::{
-    input::mouse::MouseWheel,
-    prelude::*,
-    render::camera::{Camera, OrthographicProjection},
-};
+use bevy::{prelude::*, input::mouse::MouseWheel};
 
 pub fn spawn(mut commands: Commands) {
-    let mut camera = OrthographicCameraBundle::new_3d();
-    camera.orthographic_projection.scale = 5.0;
-    camera.transform = Transform::from_xyz(5.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y);
-    commands.spawn_bundle(camera).insert(LookCamera);
-    commands.spawn_bundle(UiCameraBundle::default());
+    commands.spawn_bundle(Camera3dBundle {
+        transform: Transform::from_xyz(5.0, 5.0, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
+        ..default()
+    }).insert(LookCamera);
 }
 
 pub fn zoom(

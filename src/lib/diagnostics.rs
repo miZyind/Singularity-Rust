@@ -22,7 +22,7 @@ fn setup(mut commands: Commands, assets: Res<AssetServer>) {
         .spawn_bundle(TextBundle {
             style: Style {
                 align_self: AlignSelf::FlexEnd,
-                ..Default::default()
+                ..default()
             },
             text: Text {
                 sections: vec![
@@ -43,9 +43,9 @@ fn setup(mut commands: Commands, assets: Res<AssetServer>) {
                         },
                     },
                 ],
-                ..Default::default()
+                ..default()
             },
-            ..Default::default()
+            ..default()
         })
         .insert(FPSText);
 }

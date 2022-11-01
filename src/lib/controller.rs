@@ -67,12 +67,6 @@ pub struct Mass {
     pub mass: f32,
 }
 
-impl Mass {
-    pub fn new(mass: f32) -> Self {
-        Self { mass }
-    }
-}
-
 pub fn input_to_events(
     time: Res<Time>,
     keyboard_input: Res<Input<KeyCode>>,

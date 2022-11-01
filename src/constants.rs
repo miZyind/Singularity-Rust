@@ -7,11 +7,6 @@ pub const ZOON_MAX: f32 = 10.0;
 pub const ZOOM_SENSITIVITY: f32 = 0.1;
 pub const PLAYER: u32 = 0b1;
 pub const GROUND: u32 = 0b10;
-pub struct PATH;
-impl PATH {
-    pub const FONT: &'static str = "fonts/Endor.ttf";
-    pub const LOGO: &'static str = "images/logo.png";
-}
 pub struct COLOR;
 impl COLOR {
     pub const WHITE: Color = Color::WHITE;

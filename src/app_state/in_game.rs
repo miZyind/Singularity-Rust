@@ -9,8 +9,7 @@ impl Plugin for State {
         app.add_system_set(
             SystemSet::on_enter(AppState::InGame)
                 .with_system(world::spawn)
-                .with_system(player::spawn)
-                .with_system(camera::spawn),
+                .with_system(player::spawn),
         )
         .add_system_set(SystemSet::on_update(AppState::InGame).with_system(camera::zoom));
     }

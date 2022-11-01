@@ -1,6 +1,6 @@
 {
   "recommendations": [
-    "matklad.rust-analyzer",
+    "rust-lang.rust-analyzer",
     "serayuzgur.crates",
     "cesium.gltf-vscode",
     "tamasfe.even-better-toml"

@@ -1,24 +1,24 @@
 use bevy::app::{PluginGroup, PluginGroupBuilder};
 
-mod game;
-mod initialization;
+mod in_game;
 mod loading;
-mod menu;
+mod main_menu;
+mod splash;
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 enum AppState {
-    Initialization,
+    Splash,
     Loading,
-    Menu,
+    MainMenu,
     InGame,
 }
 
 pub struct Plugins;
 impl PluginGroup for Plugins {
     fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group.add(initialization::State);
+        group.add(splash::State);
         group.add(loading::State);
-        group.add(menu::State);
-        group.add(game::State);
+        group.add(main_menu::State);
+        group.add(in_game::State);
     }
 }

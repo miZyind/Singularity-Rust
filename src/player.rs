@@ -1,7 +1,6 @@
 use bevy::prelude::*;
-use bevy_rapier3d::{physics::*, prelude::*};
 
-use crate::{constants, lib::controller::*};
+use crate::lib::controller::*;
 
 pub fn spawn(mut commands: Commands, assets: Res<AssetServer>) {
     commands
@@ -11,26 +10,10 @@ pub fn spawn(mut commands: Commands, assets: Res<AssetServer>) {
             Controller::default(),
             BodyTag,
         ))
-        .insert_bundle(RigidBodyBundle {
-            position: Vec3::new(0.0, 5.0, 0.0).into(),
-            mass_properties: (RigidBodyMassPropsFlags::ROTATION_LOCKED_X
-                | RigidBodyMassPropsFlags::ROTATION_LOCKED_Z)
-                .into(),
-            activation: RigidBodyActivation::cannot_sleep().into(),
-            ..Default::default()
-        })
-        .insert_bundle(ColliderBundle {
-            shape: ColliderShape::cuboid(0.5, 1.0, 0.5).into(),
-            mass_properties: ColliderMassProps::Density(1.0).into(),
-            flags: ColliderFlags {
-                collision_groups: InteractionGroups::all().with_memberships(constants::PLAYER),
-                ..Default::default()
-            }
-            .into(),
-            ..Default::default()
-        })
-        .insert(RigidBodyPositionSync::Discrete)
         .with_children(|parent| {
-            parent.spawn_scene(assets.load("models/shiba/shiba.gltf#Scene0"));
+            parent.spawn_bundle(SceneBundle {
+                scene: assets.load("models/shiba/shiba.gltf#Scene0"),
+                ..default()
+            });
         });
 }
