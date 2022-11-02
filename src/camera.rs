@@ -26,15 +26,10 @@ pub fn zoom(
 ) {
     for mouse_wheel in mouse_wheel_reader.iter() {
         if let Ok(mut projection) = query.get_single_mut() {
-            if let Projection::Orthographic(orthographic) = &*projection {
+            if let Projection::Orthographic(projection) = &mut *projection {
                 let zoom_scalar = 1.0 - constants::ZOOM_SENSITIVITY * mouse_wheel.y;
-                let zoomed = orthographic.scale * zoom_scalar;
-                let scale = zoomed.max(constants::ZOON_MIN).min(constants::ZOON_MAX);
-                *projection = Projection::Orthographic(OrthographicProjection {
-                    scale,
-                    scaling_mode: ScalingMode::FixedVertical(2.0),
-                    ..default()
-                });
+                let zoomed = projection.scale * zoom_scalar;
+                projection.scale = zoomed.max(constants::ZOON_MIN).min(constants::ZOON_MAX);
             }
         }
     }
