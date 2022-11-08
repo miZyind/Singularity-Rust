@@ -1,23 +1,23 @@
 use bevy::input::keyboard::KeyCode;
 
 pub struct Inputs {
-    pub key_forward: KeyCode,
-    pub key_backward: KeyCode,
-    pub key_left: KeyCode,
-    pub key_right: KeyCode,
-    pub key_jump: KeyCode,
-    pub key_run: KeyCode,
+    pub forward: KeyCode,
+    pub backward: KeyCode,
+    pub left: KeyCode,
+    pub right: KeyCode,
+    pub jump: KeyCode,
+    pub run: KeyCode,
 }
 
 impl Default for Inputs {
     fn default() -> Self {
         Self {
-            key_forward: KeyCode::W,
-            key_backward: KeyCode::S,
-            key_left: KeyCode::A,
-            key_right: KeyCode::D,
-            key_jump: KeyCode::Space,
-            key_run: KeyCode::LShift,
+            forward: KeyCode::W,
+            backward: KeyCode::S,
+            left: KeyCode::A,
+            right: KeyCode::D,
+            jump: KeyCode::Space,
+            run: KeyCode::LShift,
         }
     }
 }
