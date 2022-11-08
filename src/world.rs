@@ -31,7 +31,7 @@ pub fn spawn(
             ..default()
         })
         .insert_bundle((
-            Transform::from_xyz(distance, 8.0, distance),
+            Transform::from_xyz(distance, 5.0, distance),
             RigidBody::Dynamic,
             collider.clone(),
         ));
