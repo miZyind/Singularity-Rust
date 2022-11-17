@@ -18,11 +18,8 @@ pub fn spawn(mut commands: Commands) {
     });
 }
 
-pub fn zoom(
-    mut mouse_wheel_reader: EventReader<MouseWheel>,
-    mut query: Query<&mut Projection, With<Camera>>,
-) {
-    for mouse_wheel in mouse_wheel_reader.iter() {
+pub fn zoom(mut events: EventReader<MouseWheel>, mut query: Query<&mut Projection, With<Camera>>) {
+    for mouse_wheel in events.iter() {
         if let Ok(mut projection) = query.get_single_mut() {
             if let Projection::Orthographic(projection) = &mut *projection {
                 let zoom_scalar = 1.0 - constants::ZOOM_SENSITIVITY * mouse_wheel.y;

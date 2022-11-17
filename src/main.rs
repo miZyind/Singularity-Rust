@@ -5,6 +5,8 @@ mod constants;
 mod lib;
 mod player;
 mod world;
+#[cfg(feature = "debug")]
+use bevy_inspector_egui::WorldInspectorPlugin;
 
 use bevy::{log::LogSettings, prelude::*};
 

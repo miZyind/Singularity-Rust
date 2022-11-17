@@ -7,20 +7,13 @@ pub fn spawn(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // plane
-    let plane_size = 10.0;
-    let plane_height = 1.0;
     commands
         .spawn_bundle(PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+            mesh: meshes.add(Mesh::from(shape::Plane { size: 10.0 })),
             material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
-            transform: Transform::from_matrix(Mat4::from_scale_rotation_translation(
-                Vec3::new(plane_size, plane_height, plane_size),
-                Quat::IDENTITY,
-                Vec3::ZERO,
-            )),
             ..default()
         })
-        .insert(Collider::cuboid(0.5, 0.5, 0.5));
+        .insert(Collider::cuboid(5.0, 0.0, 5.0));
     // cubes
     let distance = 2.0;
     let collider = Collider::cuboid(0.5, 0.5, 0.5);

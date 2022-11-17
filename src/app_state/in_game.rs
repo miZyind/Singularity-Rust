@@ -1,6 +1,5 @@
-use crate::{camera, player, world};
-
 use super::AppState;
+use crate::{camera, player, world};
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 

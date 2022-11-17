@@ -8,12 +8,15 @@ repository = "https://github.com/miZyind/singularity"
 license = "MIT"
 keywords = ["game", "bevy"]
 
+[features]
+debug = ["bevy-inspector-egui"]
+
 [dependencies]
 bevy = "0.8.1"
 bevy_rapier3d = "0.18.0"
-bevy_asset_loader = { version = "0.12", features = ["progress_tracking"] }
-bevy-inspector-egui = { version = "0.13", optional = true }
-iyes_progress = "0.5.0"
+bevy_asset_loader = { version = "0.13.0", features = ["progress_tracking"] }
+bevy-inspector-egui = { version = "0.13.0", optional = true }
+iyes_progress = "0.6.0"
 
 [profile.release]
 opt-level = "s"

@@ -29,7 +29,8 @@ pub fn spawn(mut commands: Commands, resources: Res<UIAssets>) {
             },
             Player,
             RigidBody::Dynamic,
-            Collider::capsule_y(0.05, 0.7),
+            // Collider::capsule_y(0.05, 0.7),
+            Collider::cuboid(0.5, 0.5, 0.5),
             ColliderMassProperties::default(),
             LockedAxes::ROTATION_LOCKED,
             KinematicCharacterController::default(),
@@ -41,6 +42,7 @@ pub fn handle_move(
     input: Res<Input<KeyCode>>,
     mut query: Query<
         (
+            &mut Transform,
             &mut Jumper,
             &mut KinematicCharacterController,
             Option<&KinematicCharacterControllerOutput>,
@@ -48,23 +50,25 @@ pub fn handle_move(
         With<Player>,
     >,
 ) {
-    let (mut jumper, mut controller, controller_output) = query.single_mut();
+    let (mut transform, mut jumper, mut controller, controller_output) = query.single_mut();
     let mut desired_movement = Vec3::ZERO;
     let mut speed = 0.1;
+    let x = Vec3::new(1.0, 0.0, -1.0);
+    let z = Vec3::new(1.0, 0.0, 1.0);
 
     for key in input.get_pressed() {
         match *key {
             KeyCode::D => {
-                desired_movement.x += -1.0;
+                desired_movement += x;
             }
             KeyCode::A => {
-                desired_movement.x -= -1.0;
+                desired_movement -= x;
             }
             KeyCode::W => {
-                desired_movement.z += 1.0;
+                desired_movement -= z;
             }
             KeyCode::S => {
-                desired_movement.z -= 1.0;
+                desired_movement += z;
             }
             KeyCode::Space => {
                 if jumper.grounded {
@@ -90,6 +94,11 @@ pub fn handle_move(
 
     if let Some(output) = controller_output {
         jumper.grounded = output.grounded;
+
+        if output.effective_translation.z != 0.0 || output.effective_translation.x != 0.0 {
+            let angle = (-output.effective_translation.z).atan2(output.effective_translation.x);
+            transform.rotation = transform.rotation.lerp(Quat::from_rotation_y(angle), 0.2);
+        }
     }
 
     desired_movement *= speed;
