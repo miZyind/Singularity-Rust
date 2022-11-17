@@ -1,9 +1,9 @@
-use bevy::app::{PluginGroup, PluginGroupBuilder};
-
 mod in_game;
 mod loading;
 mod main_menu;
 mod splash;
+
+use bevy::app::{PluginGroup, PluginGroupBuilder};
 
 #[derive(Debug, Clone, Eq, PartialEq, Hash)]
 enum AppState {

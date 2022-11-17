@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
+use std::f32::consts::*;
 
 pub fn spawn(
     mut commands: Commands,
@@ -62,8 +63,27 @@ pub fn spawn(
             collider.clone(),
         ));
     // light
-    commands.spawn_bundle(PointLightBundle {
-        transform: Transform::from_xyz(0.0, 10.0, 0.0),
+    commands.spawn_bundle(DirectionalLightBundle {
+        directional_light: DirectionalLight {
+            illuminance: 50000.0,
+            shadow_projection: OrthographicProjection {
+                left: -10.0,
+                right: 10.0,
+                bottom: -10.0,
+                top: 10.0,
+                near: -50.0,
+                far: 50.0,
+                ..default()
+            },
+            shadows_enabled: true,
+            ..default()
+        },
+        transform: Transform::from_rotation(Quat::from_euler(
+            EulerRot::ZYX,
+            0.0,
+            FRAC_PI_2,
+            -FRAC_PI_4,
+        )),
         ..default()
     });
 }

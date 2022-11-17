@@ -3,14 +3,14 @@ use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
 #[derive(Component)]
-pub struct Player;
-
-#[derive(Component)]
-pub struct Jumper {
-    jumping: bool,
-    jump_time: f32,
+pub struct Player {
+    move_speed: f32,
+    rotate_speed: f32,
     grounded: bool,
-    buttom_time: f32,
+    jumping: bool,
+    jump_power: f32,
+    jump_time: f32,
+    jump_time_max: f32,
 }
 
 pub fn spawn(mut commands: Commands, resources: Res<UIAssets>) {
@@ -21,16 +21,17 @@ pub fn spawn(mut commands: Commands, resources: Res<UIAssets>) {
             ..default()
         })
         .insert_bundle((
-            Jumper {
-                jumping: false,
-                jump_time: 0.0,
+            Player {
+                move_speed: 0.1,
+                rotate_speed: 0.2,
                 grounded: false,
-                buttom_time: 0.2,
+                jumping: false,
+                jump_power: 2.0,
+                jump_time: 0.0,
+                jump_time_max: 0.2,
             },
-            Player,
             RigidBody::Dynamic,
-            // Collider::capsule_y(0.05, 0.7),
-            Collider::cuboid(0.5, 0.5, 0.5),
+            Collider::cuboid(0.5, 0.5, 0.5), // Collider::capsule_y(0.05, 0.7),
             ColliderMassProperties::default(),
             LockedAxes::ROTATION_LOCKED,
             KinematicCharacterController::default(),
@@ -43,16 +44,16 @@ pub fn handle_move(
     mut query: Query<
         (
             &mut Transform,
-            &mut Jumper,
+            &mut Player,
             &mut KinematicCharacterController,
             Option<&KinematicCharacterControllerOutput>,
         ),
         With<Player>,
     >,
 ) {
-    let (mut transform, mut jumper, mut controller, controller_output) = query.single_mut();
+    let (mut transform, mut player, mut controller, controller_output) = query.single_mut();
     let mut desired_movement = Vec3::ZERO;
-    let mut speed = 0.1;
+    let mut speed = player.move_speed;
     let x = Vec3::new(1.0, 0.0, -1.0);
     let z = Vec3::new(1.0, 0.0, 1.0);
 
@@ -71,9 +72,9 @@ pub fn handle_move(
                 desired_movement += z;
             }
             KeyCode::Space => {
-                if jumper.grounded {
-                    jumper.jumping = true;
-                    jumper.jump_time = 0.0;
+                if player.grounded {
+                    player.jumping = true;
+                    player.jump_time = 0.0;
                 }
             }
             KeyCode::LShift => {
@@ -83,21 +84,28 @@ pub fn handle_move(
         }
     }
 
-    if jumper.jumping {
-        desired_movement.y = 2.0;
-        jumper.jump_time += time.delta_seconds();
+    if player.jumping {
+        desired_movement.y = player.jump_power;
+        player.jump_time += time.delta_seconds();
 
-        if jumper.jump_time > jumper.buttom_time {
-            jumper.jumping = false;
+        if player.jump_time > player.jump_time_max {
+            player.jumping = false;
         }
     }
 
-    if let Some(output) = controller_output {
-        jumper.grounded = output.grounded;
+    if let Some(&KinematicCharacterControllerOutput {
+        grounded,
+        effective_translation,
+        ..
+    }) = controller_output
+    {
+        player.grounded = grounded;
 
-        if output.effective_translation.z != 0.0 || output.effective_translation.x != 0.0 {
-            let angle = (-output.effective_translation.z).atan2(output.effective_translation.x);
-            transform.rotation = transform.rotation.lerp(Quat::from_rotation_y(angle), 0.2);
+        if effective_translation.x != 0.0 || effective_translation.z != 0.0 {
+            let angle = (-effective_translation.z).atan2(effective_translation.x);
+            transform.rotation = transform
+                .rotation
+                .lerp(Quat::from_rotation_y(angle), player.rotate_speed);
         }
     }
 
