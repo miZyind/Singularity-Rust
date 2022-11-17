@@ -24,11 +24,11 @@ fn main() {
     })
     .insert_resource(ClearColor(Color::BLACK))
     .add_plugins(DefaultPlugins)
-    .add_plugins(app_state::Plugins)
-    .add_system(bevy::window::close_on_esc);
+    .add_plugins(app_state::Plugins);
 
     #[cfg(feature = "debug")]
-    app.add_plugin(WorldInspectorPlugin::new());
+    app.add_plugin(WorldInspectorPlugin::new())
+        .add_system(bevy::window::close_on_esc);
 
     app.run();
 }

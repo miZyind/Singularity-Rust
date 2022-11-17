@@ -7,7 +7,6 @@ pub struct State;
 impl Plugin for State {
     fn build(&self, app: &mut App) {
         app.add_plugin(RapierPhysicsPlugin::<NoUserData>::default())
-            .add_plugin(RapierDebugRenderPlugin::default())
             .add_system_set(
                 SystemSet::on_enter(AppState::InGame)
                     .with_system(world::spawn)
@@ -18,5 +17,8 @@ impl Plugin for State {
                     .with_system(camera::zoom)
                     .with_system(player::handle_move),
             );
+
+        #[cfg(feature = "debug")]
+        app.add_plugin(RapierDebugRenderPlugin::default());
     }
 }

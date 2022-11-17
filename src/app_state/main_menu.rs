@@ -82,34 +82,34 @@ fn enter(mut commands: Commands, resources: Res<UIAssets>, windows: Res<Windows>
                         ),
                         ..default()
                     });
-                    parent
-                        .spawn_bundle(ButtonBundle {
-                            style: Style {
-                                size: button_size,
-                                justify_content: JustifyContent::Center,
-                                align_items: AlignItems::Center,
-                                margin: UiRect {
-                                    bottom: Val::Percent(10.0),
-                                    ..default()
-                                },
-                                ..default()
-                            },
-                            ..default()
-                        })
-                        .insert(ExitButton)
-                        .with_children(|parent| {
-                            parent.spawn_bundle(TextBundle {
-                                text: Text::from_section(
-                                    "Exit",
-                                    TextStyle {
-                                        font: resources.font.clone(),
-                                        font_size: normalize(&windows, 44.0),
-                                        color: COLOR::FOREGROUND_SECONDARY,
-                                    },
-                                ),
-                                ..default()
-                            });
-                        });
+                    // parent
+                    //     .spawn_bundle(ButtonBundle {
+                    //         style: Style {
+                    //             size: button_size,
+                    //             justify_content: JustifyContent::Center,
+                    //             align_items: AlignItems::Center,
+                    //             margin: UiRect {
+                    //                 bottom: Val::Percent(10.0),
+                    //                 ..default()
+                    //             },
+                    //             ..default()
+                    //         },
+                    //         ..default()
+                    //     })
+                    //     .insert(ExitButton)
+                    //     .with_children(|parent| {
+                    //         parent.spawn_bundle(TextBundle {
+                    //             text: Text::from_section(
+                    //                 "Exit",
+                    //                 TextStyle {
+                    //                     font: resources.font.clone(),
+                    //                     font_size: normalize(&windows, 44.0),
+                    //                     color: COLOR::FOREGROUND_SECONDARY,
+                    //                 },
+                    //             ),
+                    //             ..default()
+                    //         });
+                    //     });
                     parent
                         .spawn_bundle(ButtonBundle {
                             style: Style {
