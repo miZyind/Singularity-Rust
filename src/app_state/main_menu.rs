@@ -73,7 +73,7 @@ fn enter(mut commands: Commands, resources: Res<UIAssets>, windows: Res<Windows>
                             ..default()
                         },
                         text: Text::from_section(
-                            "v2022-05-12",
+                            "v2022-11-17",
                             TextStyle {
                                 font: resources.font.clone(),
                                 font_size: normalize(&windows, 38.0),
