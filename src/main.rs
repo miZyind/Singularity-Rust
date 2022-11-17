@@ -12,8 +12,6 @@ use bevy::{log::LogSettings, prelude::*};
 
 fn main() {
     let mut app = App::new();
-    #[cfg(feature = "debug")]
-    app.add_plugin(WorldInspectorPlugin::new());
     app.insert_resource(WindowDescriptor {
         title: constants::APP_NAME.to_string(),
         width: 1600.0,
@@ -27,6 +25,10 @@ fn main() {
     .insert_resource(ClearColor(Color::BLACK))
     .add_plugins(DefaultPlugins)
     .add_plugins(app_state::Plugins)
-    .add_system(bevy::window::close_on_esc)
-    .run();
+    .add_system(bevy::window::close_on_esc);
+
+    #[cfg(feature = "debug")]
+    app.add_plugin(WorldInspectorPlugin::new());
+
+    app.run();
 }
