@@ -1,6 +1,7 @@
 use bevy::{
     diagnostic::{Diagnostics, FrameTimeDiagnosticsPlugin},
     prelude::*,
+    window::close_on_esc,
 };
 
 pub struct DiagnosticsPlugin;
@@ -9,17 +10,17 @@ impl Plugin for DiagnosticsPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugin(FrameTimeDiagnosticsPlugin::default())
             .add_startup_system(setup)
-            .add_system(update);
-        #[cfg(feature = "debug")]
-        app.add_startup_system(resize).run();
+            .add_system(update)
+            .add_system(close_on_esc);
     }
 }
+
 #[derive(Component)]
 struct FPSText;
 
 fn setup(mut commands: Commands, assets: Res<AssetServer>) {
-    commands
-        .spawn_bundle(TextBundle {
+    commands.spawn((
+        TextBundle {
             style: Style {
                 align_self: AlignSelf::FlexEnd,
                 ..default()
@@ -46,23 +47,15 @@ fn setup(mut commands: Commands, assets: Res<AssetServer>) {
                 ..default()
             },
             ..default()
-        })
-        .insert(FPSText);
+        },
+        FPSText,
+    ));
 }
 
 fn update(diagnostics: Res<Diagnostics>, mut query: Query<&mut Text, With<FPSText>>) {
-    for mut text in query.iter_mut() {
-        if let Some(fps) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
-            if let Some(average) = fps.average() {
-                text.sections[1].value = format!("{:.2}", average);
-            }
+    if let Some(fps) = diagnostics.get(FrameTimeDiagnosticsPlugin::FPS) {
+        if let Some(average) = fps.average() {
+            query.single_mut().sections[1].value = format!("{:.0}", average);
         }
     }
-}
-
-#[cfg(feature = "debug")]
-fn resize(mut windows: ResMut<Windows>) {
-    let window = windows.get_primary_mut().unwrap();
-    window.set_resolution(400.0, 225.0);
-    window.set_position(IVec2::new(2782, 0));
 }

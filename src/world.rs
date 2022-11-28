@@ -8,62 +8,58 @@ pub fn spawn(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     // plane
-    commands
-        .spawn_bundle(PbrBundle {
+    commands.spawn((
+        PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Plane { size: 10.0 })),
             material: materials.add(Color::rgb(0.3, 0.5, 0.3).into()),
             ..default()
-        })
-        .insert(Collider::cuboid(5.0, 0.0, 5.0));
+        },
+        Collider::cuboid(5.0, 0.0, 5.0),
+    ));
     // cubes
     let distance = 2.0;
-    let collider = Collider::cuboid(0.5, 0.5, 0.5);
-    commands
-        .spawn_bundle(PbrBundle {
+    commands.spawn((
+        PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
             material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
+            transform: Transform::from_xyz(distance, 5.0, distance),
             ..default()
-        })
-        .insert_bundle((
-            Transform::from_xyz(distance, 5.0, distance),
-            RigidBody::Dynamic,
-            collider.clone(),
-        ));
-    commands
-        .spawn_bundle(PbrBundle {
+        },
+        RigidBody::Dynamic,
+        Collider::cuboid(0.5, 0.5, 0.5),
+    ));
+    commands.spawn((
+        PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
             material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
+            transform: Transform::from_xyz(distance, 5.0, -distance),
             ..default()
-        })
-        .insert_bundle((
-            Transform::from_xyz(distance, 5.0, -distance),
-            RigidBody::Dynamic,
-            collider.clone(),
-        ));
-    commands
-        .spawn_bundle(PbrBundle {
+        },
+        RigidBody::Dynamic,
+        Collider::cuboid(0.5, 0.5, 0.5),
+    ));
+    commands.spawn((
+        PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
             material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
+            transform: Transform::from_xyz(-distance, 5.0, distance),
             ..default()
-        })
-        .insert_bundle((
-            Transform::from_xyz(-distance, 5.0, distance),
-            RigidBody::Dynamic,
-            collider.clone(),
-        ));
-    commands
-        .spawn_bundle(PbrBundle {
+        },
+        RigidBody::Dynamic,
+        Collider::cuboid(0.5, 0.5, 0.5),
+    ));
+    commands.spawn((
+        PbrBundle {
             mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
             material: materials.add(Color::rgb(0.8, 0.7, 0.6).into()),
+            transform: Transform::from_xyz(-distance, 5.0, -distance),
             ..default()
-        })
-        .insert_bundle((
-            Transform::from_xyz(-distance, 5.0, -distance),
-            RigidBody::Dynamic,
-            collider.clone(),
-        ));
+        },
+        RigidBody::Dynamic,
+        Collider::cuboid(0.5, 0.5, 0.5),
+    ));
     // light
-    commands.spawn_bundle(DirectionalLightBundle {
+    commands.spawn(DirectionalLightBundle {
         directional_light: DirectionalLight {
             illuminance: 50000.0,
             shadow_projection: OrthographicProjection {

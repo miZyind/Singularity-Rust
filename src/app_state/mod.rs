@@ -15,10 +15,11 @@ enum AppState {
 
 pub struct Plugins;
 impl PluginGroup for Plugins {
-    fn build(&mut self, group: &mut PluginGroupBuilder) {
-        group.add(splash::State);
-        group.add(loading::State);
-        group.add(main_menu::State);
-        group.add(in_game::State);
+    fn build(self) -> PluginGroupBuilder {
+        PluginGroupBuilder::start::<Self>()
+            .add(splash::State)
+            .add(loading::State)
+            .add(main_menu::State)
+            .add(in_game::State)
     }
 }

@@ -1,12 +1,8 @@
 use crate::constants;
-use bevy::{
-    input::mouse::MouseWheel,
-    prelude::*,
-    render::camera::{Projection, ScalingMode},
-};
+use bevy::{input::mouse::MouseWheel, prelude::*, render::camera::ScalingMode};
 
 pub fn spawn(mut commands: Commands) {
-    commands.spawn_bundle(Camera3dBundle {
+    commands.spawn(Camera3dBundle {
         projection: OrthographicProjection {
             scale: 5.0,
             scaling_mode: ScalingMode::FixedVertical(2.0),

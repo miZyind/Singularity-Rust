@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 use bevy_asset_loader::prelude::*;
 
-#[derive(AssetCollection)]
+#[derive(AssetCollection, Resource)]
 pub struct UIAssets {
     #[asset(path = "fonts/Endor.ttf")]
     pub font: Handle<Font>,

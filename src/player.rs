@@ -14,28 +14,27 @@ pub struct Player {
 }
 
 pub fn spawn(mut commands: Commands, resources: Res<UIAssets>) {
-    commands
-        .spawn_bundle(SceneBundle {
+    commands.spawn((
+        SceneBundle {
             scene: resources.player.clone(),
             transform: Transform::from_xyz(0.0, 5.0, 0.0),
             ..default()
-        })
-        .insert_bundle((
-            Player {
-                move_speed: 0.1,
-                rotate_speed: 0.2,
-                grounded: false,
-                jumping: false,
-                jump_power: 2.0,
-                jump_time: 0.0,
-                jump_time_max: 0.2,
-            },
-            RigidBody::Dynamic,
-            Collider::cuboid(0.5, 0.5, 0.5), // Collider::capsule_y(0.05, 0.7),
-            ColliderMassProperties::default(),
-            LockedAxes::ROTATION_LOCKED,
-            KinematicCharacterController::default(),
-        ));
+        },
+        Player {
+            move_speed: 0.1,
+            rotate_speed: 0.2,
+            grounded: false,
+            jumping: false,
+            jump_power: 2.0,
+            jump_time: 0.0,
+            jump_time_max: 0.2,
+        },
+        RigidBody::Dynamic,
+        Collider::cuboid(0.5, 0.5, 0.5),
+        ColliderMassProperties::default(),
+        LockedAxes::ROTATION_LOCKED,
+        KinematicCharacterController::default(),
+    ));
 }
 
 pub fn handle_move(
